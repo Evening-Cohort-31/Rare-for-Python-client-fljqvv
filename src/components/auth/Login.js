@@ -1,8 +1,10 @@
 import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { loginUser } from "../../managers/AuthManager"
+import { useCurrentUser } from "../../context/CurrentUserContext"
 
 export const Login = ({ setToken }) => {
+  const { fetchUserData } = useCurrentUser()
   const username = useRef()
   const password = useRef()
   const navigate = useNavigate()
@@ -19,6 +21,11 @@ export const Login = ({ setToken }) => {
     loginUser(user).then(res => {
       if ("valid" in res && res.valid) {
         setToken(res.token)
+
+        const userObj = { id: res.token }
+        localStorage.setItem("auth_token", JSON.stringify(userObj))
+        fetchUserData()
+
         navigate("/")
       }
       else {

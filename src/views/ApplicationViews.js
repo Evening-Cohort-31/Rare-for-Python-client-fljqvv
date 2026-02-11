@@ -1,16 +1,18 @@
-import { Route, Routes } from "react-router-dom"
+import { Route, Routes, Navigate } from "react-router-dom"
 import { Login } from "../components/auth/Login"
 import { Register } from "../components/auth/Register"
 import { Authorized } from "./Authorized"
+import { MyPosts } from "../components/posts/MyPosts"
 
 export const ApplicationViews = ({ token, setToken }) => {
   return <>
     <Routes>
-      <Route path="/login" element={<Login setToken={setToken} />}  />
-      <Route path="/register" element={<Register setToken={setToken} />}  />
+      <Route path="/" element={<Navigate to="/my-posts" replace />} />
+      <Route path="/login" element={<Login setToken={setToken} />} />
+      <Route path="/register" element={<Register setToken={setToken} />} />
       <Route element={<Authorized token={token} />}>
-        {/* Add Routes here */}
-        
+        {/* Add additional route here */}
+        <Route path="my-posts" element={<MyPosts />} />
       </Route>
     </Routes>
   </>
