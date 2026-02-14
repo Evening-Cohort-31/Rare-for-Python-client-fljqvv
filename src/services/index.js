@@ -2,4 +2,4 @@
 export { getUserById } from "./UserService.js";
 
 // Posts
-export { getPostsByUserId, getPostByUserIdExpandCategory } from "./PostService.js";
+export { getPostsByUserId, getPostByUserIdExpandCategory, getAllPosts } from "./PostService.js";
