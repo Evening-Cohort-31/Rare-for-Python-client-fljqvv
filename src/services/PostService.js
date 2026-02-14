@@ -7,3 +7,8 @@ export function getPostsByUserId(userId) {
 export function getPostByUserIdExpandCategory(userId) {
     return fetchJson(`/posts?user_id=${userId}&_expand=category`);
 }
+
+export const getAllPosts= () => {
+  return fetchJson(`/posts?_expand=category`);
+}
+
