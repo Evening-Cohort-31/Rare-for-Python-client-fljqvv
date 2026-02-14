@@ -32,7 +32,7 @@ export const NewCategory = () => {
             required
           />
         </div>
-        <button type="submit">Create Category</button>
+        <button type="submit">Save Category</button>
       </form>
     </div>
   );

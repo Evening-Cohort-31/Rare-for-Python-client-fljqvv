@@ -24,7 +24,7 @@ export const CategoriesList = () => {
   }
 
   if (!categories.length) {
-    return <><p>There are no categories available. Click the button below to start adding new categories.</p><button onClick={() => navigate("/categories/new")}>Add Category</button></>;
+    return <><p>There are no categories available. Click the button below to start adding new categories.</p><button onClick={() => navigate("/categories/new")}>Create a Category</button></>;
   }
 
   return (
@@ -36,7 +36,7 @@ export const CategoriesList = () => {
         ))}
       </ul>
         <p>Add more categories by clicking the button below.</p>
-        <button onClick={() => navigate("/categories/new")}>Add New Category</button>
+        <button onClick={() => navigate("/categories/new")}>Create a Category</button>
     </div>
   );
 }
