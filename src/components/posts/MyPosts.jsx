@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { getPostByUserIdExpandCategory } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
+import { DeleteButton } from "./DeleteButton.jsx";
 
 // React component to display the all of the current logged in user's posts
 export const MyPosts = () => {

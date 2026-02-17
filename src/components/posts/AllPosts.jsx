@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import { getAllPosts } from "../../services"
+import { DeleteButton } from "./DeleteButton"
 
 export const AllPosts = () => {
     
@@ -20,6 +21,7 @@ export const AllPosts = () => {
             <div>Author: {post.author}</div>
             <div>Category: {post.category?.label || "None"}</div>
             <div>Date: {post.publication_date}</div>
+            <DeleteButton userId={post.user_id} />
           </li>
         ))}
       </ul>
