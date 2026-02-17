@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import { getAllCategories } from "../../services";
 import { useNavigate } from "react-router-dom";
+import { Loading, Notification, PageHeader, Card, Container } from "../../design";
 
 export const CategoriesList = () => {
   const [categories, setCategories] = useState([]);
@@ -20,23 +21,30 @@ export const CategoriesList = () => {
   }, []);
 
   if (loading) {
-    return <p>Loading categories...</p>;
+    return <Loading />;
   }
 
   if (!categories.length) {
-    return <><p>There are no categories available. Click the button below to start adding new categories.</p><button onClick={() => navigate("/categories/new")}>Create a Category</button></>;
+    return (
+      <Container>
+        <PageHeader title="Categories" />
+        <Notification type="info" message="There are no categories available. Click the button below to start adding new categories." />
+        <button className="button is-link" onClick={() => navigate("/categories/new")}>Create a Category</button>
+      </Container>
+    );
   }
 
   return (
-    <div>
-      <h2>Categories</h2>
-      <ul>
+    <Container>
+      <PageHeader title="Categories" />
+      <div className="columns is-multiline">
         {categories.map(category => (
-          <li key={category.id}>{category.label}</li>
+          <div className="column is-one-third" key={category.id}>
+            <Card title={category.label} />
+          </div>
         ))}
-      </ul>
-        <p>Add more categories by clicking the button below.</p>
-        <button onClick={() => navigate("/categories/new")}>Create a Category</button>
-    </div>
+      </div>
+      <button className="button is-link mt-4" onClick={() => navigate("/categories/new")}>Create a Category</button>
+    </Container>
   );
 }
