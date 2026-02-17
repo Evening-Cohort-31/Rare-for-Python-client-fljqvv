@@ -6,6 +6,7 @@ import { MyPosts } from "../components/posts/MyPosts"
 import { AllPosts } from "../components/posts/AllPosts"
 import { CategoriesList } from "../components/categories/CategoriesList"
 import { NewCategory } from "../components/categories/NewCategory"
+import { CreateAPost } from "../components/posts/CreateAPost"
 
 export const ApplicationViews = ({ token, setToken }) => {
   return <>
@@ -17,6 +18,7 @@ export const ApplicationViews = ({ token, setToken }) => {
         {/* Add additional route here */}
         <Route path="my-posts" element={<MyPosts />} />
         <Route path="all-posts" element={<AllPosts />} />
+        <Route path="posts/new" element={<CreateAPost />} />
         <Route path="categories" element={<CategoriesList />} />
         <Route path="categories/new" element={<NewCategory />} />
       </Route>

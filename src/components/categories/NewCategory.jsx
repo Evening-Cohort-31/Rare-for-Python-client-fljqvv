@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { createCategory } from "../../services";
 import { useNavigate } from "react-router-dom";
-import { PageHeader, Container } from "../../design";
 
 export const NewCategory = () => {
   const [label, setLabel] = useState("");
@@ -20,8 +19,12 @@ export const NewCategory = () => {
   };
 
   return (
-    <Container>
-      <PageHeader title="Add New Category" />
+    <div className="container">
+      <section className="hero is-small is-link mb-5">
+        <div className="hero-body">
+          <p className="title">Add New Category</p>
+        </div>
+      </section>
       <form onSubmit={handleSubmit}>
         <div className="field">
           <label className="label">Category Name</label>
@@ -44,6 +47,6 @@ export const NewCategory = () => {
           </div>
         </div>
       </form>
-    </Container>
+    </div>
   );
 }
