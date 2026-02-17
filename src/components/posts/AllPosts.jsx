@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react"
 import { getAllPosts } from "../../services"
+import { useCurrentUser } from "../../context/CurrentUserContext.js";
+import { useNavigate } from "react-router-dom";
 
 export const AllPosts = () => {
-    
+    const { currentUser } = useCurrentUser();
+    const navigate = useNavigate();
     const [posts, setPosts] = useState([])
 
     useEffect(()=>{
@@ -20,6 +23,9 @@ export const AllPosts = () => {
             <div>Author: {post.author}</div>
             <div>Category: {post.category?.label || "None"}</div>
             <div>Date: {post.publication_date}</div>
+            {currentUser && currentUser.id === post.user_id && (
+              <button onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
+            )}
           </li>
         ))}
       </ul>
