@@ -2,33 +2,42 @@ import { useState, useEffect } from "react"
 import { getAllPosts } from "../../services"
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 import { useNavigate } from "react-router-dom";
+import { Loading, PageHeader, Card, Container } from "../../design"
 
 export const AllPosts = () => {
-    const { currentUser } = useCurrentUser();
+const { currentUser } = useCurrentUser();
     const navigate = useNavigate();
     const [posts, setPosts] = useState([])
+    const [loading, setLoading] = useState(true)
 
     useEffect(()=>{
-        getAllPosts().then((allPosts) => 
-            setPosts(allPosts)) 
+        getAllPosts().then((allPosts) => {
+            setPosts(allPosts)
+            setLoading(false)
+        })
     }, [])
-    
+
+    if (loading) {
+        return <Loading />
+    }
+
     return (
-    <div>
-      <h2>All Posts</h2>
-      <ul>
+    <Container>
+      <PageHeader title="All Posts" />
+      <div className="columns is-multiline">
         {posts.map(post => (
-          <li key={post.id}>
-            <strong>{post.title}</strong>
-            <div>Author: {post.author}</div>
-            <div>Category: {post.category?.label || "None"}</div>
-            <div>Date: {post.publication_date}</div>
-            {currentUser && currentUser.id === post.user_id && (
+          <div className="column is-half" key={post.id}>
+            <Card title={post.title}>
+              <p><strong>Author:</strong> {post.author}</p>
+              <p><strong>Category:</strong> {post.category?.label || "None"}</p>
+              <p><strong>Date:</strong> {post.publication_date}</p>
+              {currentUser && currentUser.id === post.user_id && (
               <button onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
             )}
-          </li>
+          </Card>
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </Container>
   )
 }
