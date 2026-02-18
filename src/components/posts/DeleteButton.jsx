@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { deletePost } from "../../services"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
-import { ConfirmDialog } from "../../design/ConfirmDialog.jsx"
+import { ConfirmDialog } from "./ConfirmDialog.jsx"
 
 export const DeleteButton = ({userId}) => {
     const { currentUser, isLoading } = useCurrentUser()

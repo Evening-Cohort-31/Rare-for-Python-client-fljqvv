@@ -2,7 +2,6 @@ import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { loginUser } from "../../managers/AuthManager"
 import { useCurrentUser } from "../../context/CurrentUserContext"
-import { FormField, Notification } from "../../design"
 
 export const Login = ({ setToken }) => {
   const { fetchUserData } = useCurrentUser()
@@ -41,8 +40,19 @@ export const Login = ({ setToken }) => {
         <h1 className="title">Rare Publishing</h1>
         <p className="subtitle">Please sign in</p>
 
-        <FormField label="Username" inputRef={username} />
-        <FormField label="Password" type="password" inputRef={password} />
+        <div className="field">
+          <label className="label">Username</label>
+          <div className="control">
+            <input className="input" type="text" ref={username} />
+          </div>
+        </div>
+
+        <div className="field">
+          <label className="label">Password</label>
+          <div className="control">
+            <input className="input" type="password" ref={password} />
+          </div>
+        </div>
 
         <div className="field is-grouped">
           <div className="control">
@@ -53,9 +63,7 @@ export const Login = ({ setToken }) => {
           </div>
         </div>
         {
-          isUnsuccessful
-            ? <Notification type="danger" message="Username or password not valid" onClose={() => setisUnsuccessful(false)} />
-            : ''
+          isUnsuccessful ? <p className="help is-danger">Username or password not valid</p> : ''
         }
       </form>
     </section>

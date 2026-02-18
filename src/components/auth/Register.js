@@ -1,7 +1,7 @@
 import { useRef } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { Link } from "react-router-dom"
+import { useNavigate } from "react-router-dom"
 import { registerUser } from "../../managers/AuthManager"
-import { FormField, FormTextarea, ConfirmDialog } from "../../design"
 
 export const Register = ({setToken}) => {
   const firstName = useRef()
@@ -16,7 +16,7 @@ export const Register = ({setToken}) => {
 
   const handleRegister = (e) => {
     e.preventDefault()
-
+    
     if (password.current.value === verifyPassword.current.value) {
       const newUser = {
         username: username.current.value,
@@ -44,11 +44,33 @@ export const Register = ({setToken}) => {
       <form className="column is-two-thirds" onSubmit={handleRegister}>
       <h1 className="title">Rare Publishing</h1>
         <p className="subtitle">Create an account</p>
+        <div className="field">
+          <label className="label">First Name</label>
+          <div className="control">
+            <input className="input" type="text" ref={firstName} />
+          </div>
+        </div>
 
-        <FormField label="First Name" inputRef={firstName} />
-        <FormField label="Last Name" inputRef={lastName} />
-        <FormField label="Username" inputRef={username} />
-        <FormField label="Email" type="email" inputRef={email} />
+        <div className="field">
+          <label className="label">Last Name</label>
+          <div className="control">
+            <input className="input" type="text" ref={lastName} />
+          </div>
+        </div>
+
+        <div className="field">
+          <label className="label">Username</label>
+          <div className="control">
+            <input className="input" type="text" ref={username} />
+          </div>
+        </div>
+
+        <div className="field">
+          <label className="label">Email</label>
+          <div className="control">
+            <input className="input" type="email" ref={email} />
+          </div>
+        </div>
 
         <div className="field">
           <label className="label">Password</label>
@@ -67,7 +89,12 @@ export const Register = ({setToken}) => {
           </div>
         </div>
 
-        <FormTextarea label="Bio" placeholder="Tell us about yourself..." inputRef={bio} />
+        <div className="field">
+          <label className="label">Bio</label>
+          <div className="control">
+            <textarea className="textarea" placeholder="Tell us about yourself..." ref={bio}></textarea>
+          </div>
+        </div>
 
         <div className="field is-grouped">
           <div className="control">
@@ -79,12 +106,6 @@ export const Register = ({setToken}) => {
         </div>
 
       </form>
-
-      <ConfirmDialog
-        dialogRef={passwordDialog}
-        title="Password Mismatch"
-        message="The passwords you entered do not match. Please try again."
-      />
     </section>
   )
 }
