@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+// Added Link to enable navigation to the post detail page when a title is clicked
+import { Link } from "react-router-dom";
 import { getPostByUserIdExpandCategory } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 
@@ -40,7 +42,8 @@ export const MyPosts = () => {
       <ul>
         {posts.map(post => (
           <li key={post.id}>
-            <strong>{post.title}</strong>
+            {/* Wrapped title in Link so clicking it navigates to /posts/:id detail view */}
+            <Link to={`/posts/${post.id}`}><strong>{post.title}</strong></Link>
             <div>Author: {currentUser?.first_name} {currentUser?.last_name}</div>
             <div>Category: {post.category?.label}</div>
           </li>
