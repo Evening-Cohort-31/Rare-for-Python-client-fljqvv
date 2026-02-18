@@ -4,9 +4,9 @@ export const FormSelect = ({ label, selectRef, children }) => {
       <label className="label">{label}</label>
       <div className="control">
         <div className="select">
-          <select ref={selectRef}>
-            {children}
-          </select>
+          {children || (
+            <select ref={selectRef} />
+          )}
         </div>
       </div>
     </div>

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPost, getAllCategories } from "../../services";
+import { Container, PageHeader, FormField, FormTextarea, FormSelect } from "../../design";
 
 export const CreateAPost = () => {
   const [post, setPost] = useState({
@@ -61,68 +62,50 @@ export const CreateAPost = () => {
   };
 
   return (
-    <div className="container">
-      <section className="hero is-small is-link mb-5">
-        <div className="hero-body">
-          <p className="title">Create a Post</p>
-        </div>
-      </section>
+    <Container>
+      <PageHeader title="Create a Post" />
       <form onSubmit={handleSubmit}>
-        <div className="field">
-          <label className="label">Title</label>
-          <div className="control">
-            <input
-              className="input"
-              type="text"
-              name="title"
-              value={post.title}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
+        <FormField label="Title">
+          <input
+            className="input"
+            type="text"
+            name="title"
+            value={post.title}
+            onChange={handleChange}
+            required
+          />
+        </FormField>
 
-        <div className="field">
-          <label className="label">Image URL</label>
-          <div className="control">
-            <input
-              className="input"
-              type="url"
-              name="image_url"
-              placeholder="https://example.com/image.jpg"
-              value={post.image_url}
-              onChange={handleChange}
-            />
-          </div>
-        </div>
+        <FormField label="Image URL">
+          <input
+            className="input"
+            type="url"
+            name="image_url"
+            placeholder="https://example.com/image.jpg"
+            value={post.image_url}
+            onChange={handleChange}
+          />
+        </FormField>
 
-        <div className="field">
-          <label className="label">Content</label>
-          <div className="control">
-            <textarea
-              className="textarea"
-              name="content"
-              placeholder="Write your article..."
-              value={post.content}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
+        <FormTextarea label="Content">
+          <textarea
+            className="textarea"
+            name="content"
+            placeholder="Write your article..."
+            value={post.content}
+            onChange={handleChange}
+            required
+          />
+        </FormTextarea>
 
-        <div className="field">
-          <label className="label">Category</label>
-          <div className="control">
-            <div className="select">
-              <select name="category_id" value={post.category_id} onChange={handleCategoryChange}>
-                <option value={0}>Select a category</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
+        <FormSelect label="Category">
+          <select name="category_id" value={post.category_id} onChange={handleCategoryChange}>
+            <option value={0}>Select a category</option>
+            {categories.map(cat => (
+              <option key={cat.id} value={cat.id}>{cat.label}</option>
+            ))}
+          </select>
+        </FormSelect>
 
         <div className="field">
           <label className="label">Tags</label>
@@ -150,6 +133,6 @@ export const CreateAPost = () => {
           </div>
         </div>
       </form>
-    </div>
+    </Container>
   );
 }
