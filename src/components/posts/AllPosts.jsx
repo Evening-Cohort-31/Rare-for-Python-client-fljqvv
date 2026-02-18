@@ -3,6 +3,7 @@ import { getAllPosts } from "../../services"
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 import { useNavigate } from "react-router-dom";
 import { DeleteButton } from "./DeleteButton.jsx";
+import { Loading, PageHeader, Card, Container } from "../../design";
 
 export const AllPosts = () => {
 const { currentUser } = useCurrentUser();
@@ -24,9 +25,12 @@ const { currentUser } = useCurrentUser();
               <p><strong>Author:</strong> {post.author}</p>
               <p><strong>Category:</strong> {post.category?.label || "None"}</p>
               <p><strong>Date:</strong> {post.publication_date}</p>
-              {currentUser && currentUser.id === post.user_id && (
-              <button onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
-            )}
+              <div className="buttons">
+                  {currentUser && currentUser.id === post.user_id && (
+                  <button className ="button" onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
+                  )}
+                  <DeleteButton userId={post.user_id} />
+             </div>
           </Card>
           </div>
         ))}
