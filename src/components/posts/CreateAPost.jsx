@@ -29,7 +29,14 @@ export const CreateAPost = () => {
     const { name, value } = e.target;
     setPost(prev => ({
       ...prev,
-      [name]: name === "category_id" ? parseInt(value) : value
+      [name]: value
+    }));
+  };
+
+  const handleCategoryChange = (e) => {
+    setPost(prev => ({
+      ...prev,
+      category_id: parseInt(e.target.value)
     }));
   };
 
@@ -107,7 +114,7 @@ export const CreateAPost = () => {
           <label className="label">Category</label>
           <div className="control">
             <div className="select">
-              <select name="category_id" value={post.category_id} onChange={handleChange}>
+              <select name="category_id" value={post.category_id} onChange={handleCategoryChange}>
                 <option value={0}>Select a category</option>
                 {categories.map(cat => (
                   <option key={cat.id} value={cat.id}>{cat.label}</option>
