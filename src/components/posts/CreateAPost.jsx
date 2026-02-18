@@ -1,6 +1,7 @@
 // Component that loads a form to create a new post and submits it to the API
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { createPost, getAllCategories } from "../../services";
 
 export const CreateAPost = () => {
   const [post, setPost] = useState({
@@ -8,17 +9,16 @@ export const CreateAPost = () => {
     image_url: "",
     content: "",
     category_id: 0,
-    tag_id: 0
+    tag_ids: []
   });
+  const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
-  // TODO: Replace with actual fetch calls when API services are ready
-  const categories = [
-    { id: 1, label: "News" },
-    { id: 2, label: "Technology" },
-    { id: 3, label: "Sports" }
-  ];
+  useEffect(() => {
+    getAllCategories().then(setCategories);
+  }, []);
 
+  // TODO: Replace with actual fetch call when tag API service is ready
   const tags = [
     { id: 1, label: "JavaScript" },
     { id: 2, label: "Python" },
@@ -29,16 +29,28 @@ export const CreateAPost = () => {
     const { name, value } = e.target;
     setPost(prev => ({
       ...prev,
-      [name]: name === "category_id" || name === "tag_id" ? parseInt(value) : value
+      [name]: name === "category_id" ? parseInt(value) : value
     }));
   };
 
+  const handleTagChange = (e) => {
+    const tagId = parseInt(e.target.value);
+    setPost(prev => ({
+      ...prev,
+      tag_ids: e.target.checked
+        ? [...prev.tag_ids, tagId]
+        : prev.tag_ids.filter(id => id !== tagId)
+    }));
+  };
+
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // TODO: Replace with actual API call, e.g.:
-    // createPost(post).then(() => navigate("/my-posts"))
-    console.log("New post:", post);
-    navigate("/my-posts");
+    createPost(post).then(() => {
+      navigate("/my-posts"); //TODO: upon submit, redirect user to Post Detail page for this post instead of my-posts page
+    }).catch(error => {
+      console.error("Failed to create post:", error);
+    });
   };
 
   return (
@@ -106,16 +118,15 @@ export const CreateAPost = () => {
         </div>
 
         <div className="field">
-          <label className="label">Tag</label>
+          <label className="label">Tags</label>
           <div className="control">
             {tags.map(tag => (
-              <label className="radio" key={tag.id}>
+              <label className="checkbox mr-4" key={tag.id}>
                 <input
-                  type="radio"
-                  name="tag_id"
+                  type="checkbox"
                   value={tag.id}
-                  checked={post.tag_id === tag.id}
-                  onChange={handleChange}
+                  checked={post.tag_ids.includes(tag.id)}
+                  onChange={handleTagChange}
                 />{" "}
                 {tag.label}
               </label>

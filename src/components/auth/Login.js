@@ -22,9 +22,6 @@ export const Login = ({ setToken }) => {
     loginUser(user).then(res => {
       if ("valid" in res && res.valid) {
         setToken(res.token)
-
-        const userObj = { id: res.token }
-        localStorage.setItem("auth_token", JSON.stringify(userObj))
         fetchUserData()
 
         navigate("/")

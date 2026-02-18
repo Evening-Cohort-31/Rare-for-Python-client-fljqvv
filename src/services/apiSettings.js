@@ -15,7 +15,10 @@ export const fetchJson = async (endpoint, options = {}) => {
 export const postJson = async (endpoint, data) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Content-Type": "application/json",
+             "Authorization": localStorage.getItem("auth_token")
+            },
         body: JSON.stringify(data)
     });
 
