@@ -18,7 +18,7 @@ export const DeleteButton = ({userId}) => {
     if (currentUser.id === userId) {
         return (
         <div>
-            <button onClick={()=>{setShowConfirm(true)}}>Delete</button>
+            <button className="button is-danger" onClick={()=>{setShowConfirm(true)}}>Delete</button>
 
             <ConfirmDialog
             isOpen={showConfirm}

@@ -15,7 +15,7 @@ export const AllPosts = () => {
     }, [])
     
     return (
-    <div>
+    <div className="container">
       <h2>All Posts</h2>
       <ul>
         {posts.map(post => (
@@ -26,7 +26,7 @@ export const AllPosts = () => {
             <div>Date: {post.publication_date}</div>
             <DeleteButton userId={post.user_id} />
             {currentUser && currentUser.id === post.user_id && (
-              <button onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
+              <button className="button" onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
             )}
           </li>
         ))}
