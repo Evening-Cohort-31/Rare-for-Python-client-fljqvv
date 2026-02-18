@@ -1,8 +1,7 @@
 import { useEffect, useState } from "react";
-// Added Link to enable navigation to the post detail page when a title is clicked
-import { Link } from "react-router-dom";
 import { getPostByUserIdExpandCategory } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
+import { Loading, PageHeader, Card, Container } from "../../design";
 
 // React component to display the all of the current logged in user's posts
 export const MyPosts = () => {
@@ -29,26 +28,31 @@ export const MyPosts = () => {
   }, [currentUser]);
 
   if (loading || userLoading) {
-    return <p>Loading posts...</p>;
+    return <Loading />;
   }
 
   if (!posts.length) {
-    return <p>No posts found.</p>;
+    return (
+      <Container>
+        <PageHeader title="My Posts" />
+        <p className="has-text-centered">No posts found.</p>
+      </Container>
+    );
   }
 
   return (
-    <div>
-      <h2>My Posts</h2>
-      <ul>
+    <Container>
+      <PageHeader title="My Posts" />
+      <div className="columns is-multiline">
         {posts.map(post => (
-          <li key={post.id}>
-            {/* Wrapped title in Link so clicking it navigates to /posts/:id detail view */}
-            <Link to={`/posts/${post.id}`}><strong>{post.title}</strong></Link>
-            <div>Author: {currentUser?.first_name} {currentUser?.last_name}</div>
-            <div>Category: {post.category?.label}</div>
-          </li>
+          <div className="column is-half" key={post.id}>
+            <Card title={post.title}>
+              <p><strong>Author:</strong> {currentUser?.first_name} {currentUser?.last_name}</p>
+              <p><strong>Category:</strong> {post.category?.label}</p>
+            </Card>
+          </div>
         ))}
-      </ul>
-    </div>
+      </div>
+    </Container>
   );
 }
