@@ -134,7 +134,7 @@ export const CreateAPost = () => {
           </div>
         </div>
 
-        <div className="field is-grouped">
+        <div className="buttons">
           <div className="control">
             <button className="button is-link" type="submit">Publish</button>
           </div>

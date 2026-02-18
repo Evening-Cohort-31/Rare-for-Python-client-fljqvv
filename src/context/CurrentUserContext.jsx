@@ -21,7 +21,8 @@ export const CurrentUserProvider = ({ children }) => {
 
     if (localUser) {
       setIsLoading(true);
-      getUserById(localUser)
+      const userObject = JSON.parse(localUser);
+      getUserById(userObject.id)
         .then((user) => {
           setCurrentUser(user);
         })
