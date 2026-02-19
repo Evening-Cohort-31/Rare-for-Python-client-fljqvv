@@ -49,5 +49,9 @@ export const deleteJson = async (endpoint) => {
         throw new Error(`DELETE failed: ${response.status} ${response.statusText}`);
     }
 
+    if (response.status === 204 || response.headers.get("content-length") === "0") {
+        return null;
+    }
+
     return response.json();
 };
