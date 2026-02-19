@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { getAllPosts } from "../../services";
 import { Loading, PageHeader, Card, Container } from "../../design";
 
@@ -23,16 +24,10 @@ export const AllPosts = () => {
       <div className="columns is-multiline">
         {posts.map((post) => (
           <div className="column is-half" key={post.id}>
-            <Card title={post.title}>
-              <p>
-                <strong>Author:</strong> {post.author}
-              </p>
-              <p>
-                <strong>Category:</strong> {post.category?.label || "None"}
-              </p>
-              <p>
-                <strong>Date:</strong> {post.publication_date}
-              </p>
+            <Card title={<Link to={`/posts/${post.id}`}>{post.title}</Link>}>
+              <p><strong>Author:</strong> {post.author}</p>
+              <p><strong>Category:</strong> {post.category?.label || "None"}</p>
+              <p><strong>Date:</strong> {post.publication_date}</p>
             </Card>
           </div>
         ))}
