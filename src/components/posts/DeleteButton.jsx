@@ -1,16 +1,21 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { deletePost } from "../../services"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
 import { ConfirmDialog } from "./ConfirmDialog.jsx"
+import { useNavigate } from "react-router-dom";
 
-export const DeleteButton = ({userId}) => {
+export const DeleteButton = ({userId, postId}) => {
     const { currentUser, isLoading } = useCurrentUser()
     const [showConfirm, setShowConfirm] = useState(false)
+    const navigate = useNavigate();
 
-    const handleDelete = (e) => {
-        e.preventDefault()
-        window.alert("The post has been deleted.")
+    const handleDelete = () => {
+        deletePost(postId).then(() => {
+            setShowConfirm(false)
+            navigate("/my-posts")
+        })
     }
+
     if (isLoading || !currentUser) {
         return null
     }

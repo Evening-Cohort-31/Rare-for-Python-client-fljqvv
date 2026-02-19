@@ -29,7 +29,7 @@ const { currentUser } = useCurrentUser();
                   {currentUser && currentUser.id === post.user_id && (
                   <button className ="button" onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
                   )}
-                  <DeleteButton userId={post.user_id} />
+                  <DeleteButton userId={post.user_id} postId={post.id}/>
              </div>
           </Card>
           </div>
