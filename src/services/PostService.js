@@ -1,7 +1,7 @@
 import { fetchJson, putJson } from "./apiSettings";
 
 export function getPostsByUserId(userId) {
-    return fetchJson(`/posts?user_id=${userId}`);
+  return fetchJson(`/posts?user_id=${userId}`);
 }
 
 export function getPostsByUserIdExpandCategory(userId) {
@@ -17,6 +17,7 @@ export function getPostByIdExpandCategory(postId) {
     return fetchJson(`/posts/${postId}?_expand=category`);
 }
 
+// Added for Ticket #5 - Fetches a single post by its ID for the PostDetails view
 export function getPostById(postId) {
     return fetchJson(`/posts/${postId}`);
 }
