@@ -1,4 +1,4 @@
-export const ConfirmDialog = ({ isOpen, title, message, onConfirm, onCancel }) => {
+export const ConfirmDelete = ({ isOpen, title, message, onConfirm, onCancel }) => {
     if (!isOpen) return null;
 
     return (

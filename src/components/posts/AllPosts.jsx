@@ -3,7 +3,7 @@ import { getAllPosts } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 // CHANGED: Added Link alongside useNavigate (Added on view_post_details_5)
 import { Link, useNavigate } from "react-router-dom";
-import { DeleteButton } from "./DeleteButton.jsx";
+import { DeleteButton } from "../../design/DeleteButton.jsx";
 import { Loading, PageHeader, Card, Container } from "../../design";;
 
 export const AllPosts = () => {
@@ -47,7 +47,6 @@ export const AllPosts = () => {
                   Edit Post
                 </button>
                     )}
-                    <DeleteButton userId={post.user_id} postId={post.id}/>
              </div>
           </Card>
           </div>

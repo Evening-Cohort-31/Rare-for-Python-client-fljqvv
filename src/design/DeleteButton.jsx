@@ -1,7 +1,7 @@
 import { useState } from "react"
-import { deletePost } from "../../services"
-import { useCurrentUser } from "../../context/CurrentUserContext.js"
-import { ConfirmDialog } from "./ConfirmDialog.jsx"
+import { deletePost } from "../services/index.js"
+import { useCurrentUser } from "../context/CurrentUserContext.js"
+import { ConfirmDelete } from "./ConfirmDelete.jsx"
 import { useNavigate } from "react-router-dom";
 
 export const DeleteButton = ({userId, postId}) => {
@@ -12,7 +12,7 @@ export const DeleteButton = ({userId, postId}) => {
     const handleDelete = () => {
         deletePost(postId).then(() => {
             setShowConfirm(false)
-            navigate("/my-posts")
+            navigate("/all-posts")
         })
     }
 
@@ -25,7 +25,7 @@ export const DeleteButton = ({userId, postId}) => {
         <div>
             <button className="button is-danger" onClick={()=>{setShowConfirm(true)}}>Delete</button>
 
-            <ConfirmDialog
+            <ConfirmDelete
             isOpen={showConfirm}
             title="Delete Post"
             message={`Are you sure you want to delete this post? This action cannot be undone.`}
