@@ -6,6 +6,8 @@ import { MyPosts } from "../components/posts/MyPosts"
 import { AllPosts } from "../components/posts/AllPosts"
 import { CategoriesList } from "../components/categories/CategoriesList"
 import { NewCategory } from "../components/categories/NewCategory"
+import { EditPost } from "../components/posts/EditPost"
+import { BulmaSampler } from "../bulma/BulmaSampler"
 
 export const ApplicationViews = ({ token, setToken }) => {
   return <>
@@ -16,9 +18,11 @@ export const ApplicationViews = ({ token, setToken }) => {
       <Route element={<Authorized token={token} />}>
         {/* Add additional route here */}
         <Route path="my-posts" element={<MyPosts />} />
+        <Route path="my-posts/edit/:postId" element={<EditPost />} />
         <Route path="all-posts" element={<AllPosts />} />
         <Route path="categories" element={<CategoriesList />} />
         <Route path="categories/new" element={<NewCategory />} />
+        <Route path="bulma-sampler" element={<BulmaSampler />} />
       </Route>
     </Routes>
   </>

@@ -2,7 +2,7 @@
 export { getUserById } from "./UserService.js";
 
 // Posts
-export { getPostsByUserId, getPostByUserIdExpandCategory, getAllPosts } from "./PostService.js";
+export { getPostsByUserId, getPostsByUserIdExpandCategory, getAllPosts, getPostByIdExpandCategory, getPostById, updatePost } from "./PostService.js";
 
 // Categories
 export { getAllCategories, createCategory } from "./CategoryService.js";

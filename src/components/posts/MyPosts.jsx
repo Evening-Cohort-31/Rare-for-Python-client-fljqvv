@@ -1,17 +1,19 @@
 import { useEffect, useState } from "react";
-import { getPostByUserIdExpandCategory } from "../../services";
+import { getPostsByUserIdExpandCategory } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
+import { useNavigate } from "react-router-dom";
 import { Loading, PageHeader, Card, Container } from "../../design";
 
 // React component to display the all of the current logged in user's posts
 export const MyPosts = () => {
   const { currentUser, isLoading: userLoading } = useCurrentUser();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (currentUser) {
-      getPostByUserIdExpandCategory(currentUser.id).then(fetchedPosts => {
+      getPostsByUserIdExpandCategory(currentUser.id).then(fetchedPosts => {
         const sortedPosts = fetchedPosts.sort((a, b) =>
           new Date(b.publication_date) - new Date(a.publication_date)
         );
@@ -49,7 +51,8 @@ export const MyPosts = () => {
             <Card title={post.title}>
               <p><strong>Author:</strong> {currentUser?.first_name} {currentUser?.last_name}</p>
               <p><strong>Category:</strong> {post.category?.label}</p>
-            </Card>
+              <button onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
+          </Card>
           </div>
         ))}
       </div>
