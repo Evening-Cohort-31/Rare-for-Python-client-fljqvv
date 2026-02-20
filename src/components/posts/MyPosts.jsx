@@ -7,6 +7,7 @@ import { Container, PageHeader, Loading, Card } from "../../design";
 // React component to display all of the current logged in user's posts
 export const MyPosts = () => {
   const { currentUser, isLoading: userLoading } = useCurrentUser();
+  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
