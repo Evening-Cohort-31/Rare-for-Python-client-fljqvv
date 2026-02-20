@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { getAllPosts } from "../../services";
+import { useCurrentUser } from "../../context/CurrentUserContext.js";
 import { Container, PageHeader, Loading, Card } from "../../design";
 
 export const AllPosts = () => {
+  const { currentUser } = useCurrentUser();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();

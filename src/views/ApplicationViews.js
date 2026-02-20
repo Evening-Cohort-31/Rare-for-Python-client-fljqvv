@@ -7,7 +7,7 @@ import { AllPosts } from "../components/posts/AllPosts"
 import { CategoriesList } from "../components/categories/CategoriesList"
 import { NewCategory } from "../components/categories/NewCategory"
 import { EditPost } from "../components/posts/EditPost"
-import { BulmaSampler } from "../bulma/BulmaSampler"
+import { BulmaSampler } from "../design/bulma-reference/BulmaSampler"
 // Added for Ticket #5 - Import PostDetails component for viewing individual posts
 import { PostDetails } from "../components/posts/PostDetails"
 import { CreateAPost } from "../components/posts/CreateAPost"

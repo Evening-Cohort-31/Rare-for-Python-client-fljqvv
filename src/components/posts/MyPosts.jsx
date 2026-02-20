@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getPostByUserIdExpandCategory } from "../../services";
+import { getPostsByUserIdExpandCategory } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 import { Container, PageHeader, Loading, Card } from "../../design";
 
@@ -13,7 +13,7 @@ export const MyPosts = () => {
 
   useEffect(() => {
     if (currentUser) {
-      getPostByUserIdExpandCategory(currentUser.id).then(fetchedPosts => {
+      getPostsByUserIdExpandCategory(currentUser.id).then(fetchedPosts => {
         const sortedPosts = fetchedPosts.sort((a, b) =>
           new Date(b.publication_date) - new Date(a.publication_date)
         );
