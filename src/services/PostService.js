@@ -1,18 +1,31 @@
-import { fetchJson, postJson } from "./apiSettings";
+import { fetchJson, postJson, putJson } from "./apiSettings";
 
 export function getPostsByUserId(userId) {
-    return fetchJson(`/posts?user_id=${userId}`);
+  return fetchJson(`/posts?user_id=${userId}`);
 }
 
-export function getPostByUserIdExpandCategory(userId) {
+export function getPostsByUserIdExpandCategory(userId) {
     return fetchJson(`/posts?user_id=${userId}&_expand=category`);
 }
 
-export const getAllPosts= () => {
-  return fetchJson(`/posts?_expand=category`);
+export function getAllPosts() {
+    return fetchJson(`/posts?_expand=category`);
 }
 
 export const createPost = (post) => {
   return postJson(`/posts`, post);
 }
 
+// returns a single post by ID, with the category expanded
+export function getPostByIdExpandCategory(postId) {
+    return fetchJson(`/posts/${postId}?_expand=category`);
+}
+
+// Added for Ticket #5 - Fetches a single post by its ID for the PostDetails view
+export function getPostById(postId) {
+    return fetchJson(`/posts/${postId}`);
+}
+
+export function updatePost(postId, postData) {
+    return putJson(`/posts/${postId}`, postData);
+}

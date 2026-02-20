@@ -24,12 +24,24 @@ export const AllPosts = () => {
       <PageHeader title="All Posts" />
       <button className="button is-link mb-5" onClick={() => navigate("/posts/new")}>New Post</button>
       <div className="columns is-multiline">
-        {posts.map(post => (
+        {posts.map((post) => (
           <div className="column is-half" key={post.id}>
-            <Card title={post.title}>
-              <p><strong>Author:</strong> {post.author}</p>
-              <p><strong>Category:</strong> {post.category?.label || "None"}</p>
-              <p><strong>Date:</strong> {post.publication_date}</p>
+            {/* CHANGED: Wrapped title in Link for clickable navigation to post details (Added on view_post_details_5) */}
+            <Card title={<Link to={`/posts/${post.id}`}>{post.title}</Link>}>
+              <p>
+                <strong>Author:</strong> {post.author}
+              </p>
+              <p>
+                <strong>Category:</strong> {post.category?.label || "None"}
+              </p>
+              <p>
+                <strong>Date:</strong> {post.publication_date}
+              </p>
+              {currentUser && currentUser.id === post.user_id && (
+                <button onClick={() => navigate(`/my-posts/edit/${post.id}`)}>
+                  Edit Post
+                </button>
+              )}
             </Card>
           </div>
         ))}
