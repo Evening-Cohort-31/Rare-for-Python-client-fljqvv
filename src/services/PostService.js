@@ -1,4 +1,4 @@
-import { fetchJson, putJson } from "./apiSettings";
+import { fetchJson, postJson, putJson } from "./apiSettings";
 
 export function getPostsByUserId(userId) {
   return fetchJson(`/posts?user_id=${userId}`);
@@ -10,6 +10,10 @@ export function getPostsByUserIdExpandCategory(userId) {
 
 export function getAllPosts() {
     return fetchJson(`/posts?_expand=category`);
+}
+
+export const createPost = (post) => {
+  return postJson(`/posts`, post);
 }
 
 // returns a single post by ID, with the category expanded
