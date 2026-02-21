@@ -2,7 +2,9 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getAllPosts } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
-import { Container, PageHeader, Loading, Card } from "../../design";
+// CHANGED: Added Link alongside useNavigate (Added on view_post_details_5)
+import { Loading, PageHeader, Card, Container } from "../../design";;
+
 
 export const AllPosts = () => {
   const { currentUser } = useCurrentUser();
@@ -39,15 +41,18 @@ export const AllPosts = () => {
               <p>
                 <strong>Date:</strong> {post.publication_date}
               </p>
-              {currentUser && currentUser.id === post.user_id && (
-                <button onClick={() => navigate(`/my-posts/edit/${post.id}`)}>
+              <div className="buttons">
+                  {currentUser && currentUser.id === post.user_id && (
+                    <button className ="button" onClick={() => navigate(`/my-posts/edit/${post.id}`)}>
                   Edit Post
                 </button>
-              )}
-            </Card>
+                    )}
+             </div>
+          </Card>
           </div>
         ))}
-      </div>
+      
+    </div>
     </Container>
   );
 }

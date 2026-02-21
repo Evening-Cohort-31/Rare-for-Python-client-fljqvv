@@ -30,7 +30,7 @@ export const MyPosts = () => {
   }, [currentUser]);
 
   if (loading || userLoading) {
-    return <Loading />;
+    return <p>Loading posts...</p>;
   }
 
   return (

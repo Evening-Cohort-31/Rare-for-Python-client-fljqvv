@@ -4,6 +4,8 @@ import { useParams } from "react-router-dom";
 // Custom service function we created in PostService.js to fetch a single post by ID
 import { getPostById } from "../../services";
 
+import { DeleteButton } from "../../design/DeleteButton";
+
 // New component for Ticket #5 - View Post Details
 // Displays a single post's full details when a user clicks a post title from a list
 export const PostDetails = () => {
@@ -49,6 +51,8 @@ export const PostDetails = () => {
 
       {/* Full post content/body */}
       <div>{post.content}</div>
+      <DeleteButton userId={post.user_id} postId={post.id}/>
+      
     </section>
   );
 };

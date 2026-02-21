@@ -9,7 +9,7 @@ export {
   createPost,
   getPostByIdExpandCategory,
   getPostById, // Added for Ticket #5 - Post detail view
-  updatePost,
+  updatePost, deletePost ,
 } from "./PostService.js";
 
 // Categories
