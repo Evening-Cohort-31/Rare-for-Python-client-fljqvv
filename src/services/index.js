@@ -5,7 +5,8 @@ export { getUserById } from "./UserService.js";
 export {
   getPostsByUserId,
   getPostsByUserIdExpandCategory,
-  getAllPosts,
+  getAllPosts, 
+  createPost,
   getPostByIdExpandCategory,
   getPostById, // Added for Ticket #5 - Post detail view
   updatePost, deletePost ,

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { getPostsByUserIdExpandCategory } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
-import { useNavigate } from "react-router-dom";
-import { Loading, PageHeader, Card, Container } from "../../design";
+import { Container, PageHeader, Loading, Card } from "../../design";
 
-// React component to display the all of the current logged in user's posts
+// React component to display all of the current logged in user's posts
 export const MyPosts = () => {
   const { currentUser, isLoading: userLoading } = useCurrentUser();
   const navigate = useNavigate();
@@ -33,24 +33,24 @@ export const MyPosts = () => {
     return <p>Loading posts...</p>;
   }
 
-  if (!posts.length) {
-    return <p>No posts found.</p>;
-  }
-
   return (
-    <div>
-      <h2>My Posts</h2>
-      <ul>
-        {posts.map(post => (
-          <div className="column is-half" key={post.id}>
-            <Card title={post.title}>
-              <p><strong>Author:</strong> {currentUser?.first_name} {currentUser?.last_name}</p>
-              <p><strong>Category:</strong> {post.category?.label}</p>
-              <button onClick={() => navigate(`/my-posts/edit/${post.id}`)}>Edit Post</button>
-          </Card>
-          </div>
-        ))}
-      </ul>
-    </div>
+    <Container>
+      <PageHeader title="My Posts" />
+      <button className="button is-link mb-5" onClick={() => navigate("/posts/new")}>New Post</button>
+      {!posts.length ? (
+        <p className="has-text-centered">No posts found.</p>
+      ) : (
+        <div className="columns is-multiline">
+          {posts.map(post => (
+            <div className="column is-half" key={post.id}>
+              <Card title={post.title}>
+                <p><strong>Author:</strong> {currentUser?.first_name} {currentUser?.last_name}</p>
+                <p><strong>Category:</strong> {post.category?.label}</p>
+              </Card>
+            </div>
+          ))}
+        </div>
+      )}
+    </Container>
   );
 }
