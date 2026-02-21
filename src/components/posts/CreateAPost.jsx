@@ -19,12 +19,6 @@ export const CreateAPost = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-  if (currentUser?.id) {
-    setPost(prev => ({ ...prev, user_id: currentUser.id }));
-  }
-}, [currentUser]);
-
-  useEffect(() => {
     getAllCategories().then(setCategories);
   }, []);
 
