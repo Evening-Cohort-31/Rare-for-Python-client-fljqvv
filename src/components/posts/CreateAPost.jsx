@@ -2,8 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPost, getAllCategories } from "../../services";
-import { Container, PageHeader, FormField, FormTextarea } from "../../design";
-import { FormSelect } from "../../design/FormSelect";
+import { Container, PageHeader, FormField, FormTextarea, FormSelect } from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 
 export const CreateAPost = () => {
