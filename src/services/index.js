@@ -17,4 +17,4 @@ export {
 export { getAllCategories, createCategory } from "./CategoryService.js";
 
 // Comments
-export { getCommentsByPostIdExpandAuthor, createComment } from "./CommentService.js";
+export { getCommentsByPostId, createComment } from "./CommentService.js";

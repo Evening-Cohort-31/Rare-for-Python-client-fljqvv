@@ -1,7 +1,7 @@
 // Component for displaying comments related to a specific post as well as a form to add a new comment. This component is accessed via the "View Comments" button on the PostDetails page.
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { getPostById, getCommentsByPostIdExpandAuthor, createComment } from "../../services/index.js"
+import { getPostById, getCommentsByPostId, createComment } from "../../services/index.js"
 import { Loading, Notification, PageHeader, Card, Container, Button, FormTextarea, Form, FormActions, IconButton } from "../../design"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
 
@@ -35,7 +35,7 @@ export const PostComments = () => {
       try {
         const [postData, commentData] = await Promise.all([
           getPostById(postId),
-          getCommentsByPostIdExpandAuthor(postId),
+          getCommentsByPostId(postId, "author"),
         ])
         if (!isMounted) return
         setPost(postData)
@@ -54,25 +54,35 @@ export const PostComments = () => {
 
   // Function to refresh comments after adding a new one
   const refreshComments = async () => {
-    const commentData = await getCommentsByPostIdExpandAuthor(postId)
-    setComments(commentData)
+    const commentData = await getCommentsByPostId(postId, "author")
+    setComments(Array.isArray(commentData) ? commentData : [])
+  }
+
+  const handleCommentChange = (e) => {
+    console.log("CHANGE FIRED", e.target.value)
+    setNewComment(e.target.value)
   }
 
   // Submit handler for adding a new comment
   const handleCommentSubmit = async (e) => {
     e.preventDefault()
+    console.log("SUBMIT FIRED")
     const content = newComment.trim()
     if (!content) return
 
     const commentData = {
       post_id: numericPostId,
-      author_id: currentUser.id, // if your API can infer, remove this
+      author_id: currentUser.id,
       content,
     }
 
-    await createComment(commentData)
-    await refreshComments()
-    setNewComment("")
+    try {
+      await createComment(commentData)
+      await refreshComments()
+      setNewComment("")
+    } catch (error) {
+      console.error("Failed to submit comment:", error)
+    }
   }
 
   if (loading) return <Loading />
@@ -85,7 +95,7 @@ export const PostComments = () => {
       <FormTextarea
         name="comment"
         value={newComment}
-        onChange={(e) => setNewComment(e.target.value)}
+        onChange={handleCommentChange}
         placeholder="Write your comment here..."
         required
       />
