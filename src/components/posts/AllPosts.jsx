@@ -1,18 +1,15 @@
 import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { getAllPosts } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
-// CHANGED: Added Link alongside useNavigate (Added on view_post_details_5)
-import { Link, useNavigate } from "react-router-dom";
-import { DeleteButton } from "../../design/DeleteButton.jsx";
-import { Loading, PageHeader, Card, Container } from "../../design";;
+import { Container, PageHeader, Loading, Card } from "../../design";
 
 export const AllPosts = () => {
   const { currentUser } = useCurrentUser();
-  const navigate = useNavigate();
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // ADDED: useEffect to fetch all posts on mount (Added on view_post_details_5)
   useEffect(() => {
     getAllPosts().then((allPosts) => {
       setPosts(allPosts);
@@ -27,6 +24,7 @@ export const AllPosts = () => {
   return (
     <Container>
       <PageHeader title="All Posts" />
+      <button className="button is-link mb-5" onClick={() => navigate("/posts/new")}>New Post</button>
       <div className="columns is-multiline">
         {posts.map((post) => (
           <div className="column is-half" key={post.id}>
@@ -55,4 +53,4 @@ export const AllPosts = () => {
     </div>
     </Container>
   );
-};
+}
