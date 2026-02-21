@@ -11,6 +11,8 @@ import { BulmaSampler } from "../design/bulma-reference/BulmaSampler"
 // Added for Ticket #5 - Import PostDetails component for viewing individual posts
 import { PostDetails } from "../components/posts/PostDetails"
 import { CreateAPost } from "../components/posts/CreateAPost"
+import { PostComments } from "../components/comments/PostComments.jsx"
+import { ButtonDemo } from "../design/bulma-reference/ButtonDemo"
 
 export const ApplicationViews = ({ token, setToken }) => {
   return <>
@@ -27,8 +29,10 @@ export const ApplicationViews = ({ token, setToken }) => {
         <Route path="categories" element={<CategoriesList />} />
         <Route path="categories/new" element={<NewCategory />} />
         <Route path="bulma-sampler" element={<BulmaSampler />} />
+        <Route path="button-demo" element={<ButtonDemo />} />
         {/* Ticket #5 - Route for viewing a single post's details */}
         <Route path="posts/:postId" element={<PostDetails />} />
+        <Route path="posts/:postId/comments" element={<PostComments />} />
       </Route>
     </Routes>
   </>
