@@ -3,9 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { getAllPosts } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 // CHANGED: Added Link alongside useNavigate (Added on view_post_details_5)
-import { Link, useNavigate } from "react-router-dom";
 import { Loading, PageHeader, Card, Container } from "../../design";;
-import { Container, PageHeader, Loading, Card } from "../../design";
+
 
 export const AllPosts = () => {
   const { currentUser } = useCurrentUser();
