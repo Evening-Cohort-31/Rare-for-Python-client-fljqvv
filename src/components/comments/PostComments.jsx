@@ -1,19 +1,16 @@
 // Component for displaying comments related to a specific post as well as a form to add a new comment. This component is accessed via the "View Comments" button on the PostDetails page.
 import { useEffect, useMemo, useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import { getPostById, getCommentsByPostId, createComment } from "../../services/index.js"
-import { Loading, Notification, PageHeader, Card, Container, Button, FormTextarea, Form, FormActions, IconButton } from "../../design"
+import { getPostById, createComment } from "../../services/index.js"
+import { Loading, PageHeader, Container, Button, FormTextarea, Form, FormActions } from "../../design"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
 
 export const PostComments = () => {
   const { postId } = useParams()
   const navigate = useNavigate()
-
-  const [comments, setComments] = useState([])
   const [newComment, setNewComment] = useState("")
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
-
   const { currentUser } = useCurrentUser()
 
   // Memoize numeric postId to avoid unnecessary re-renders in useEffect dependencies
@@ -33,13 +30,11 @@ export const PostComments = () => {
     const load = async () => {
       setLoading(true)
       try {
-        const [postData, commentData] = await Promise.all([
+        const [postData] = await Promise.all([
           getPostById(postId),
-          getCommentsByPostId(postId, "author"),
         ])
         if (!isMounted) return
         setPost(postData)
-        setComments(Array.isArray(commentData) ? commentData : [])
       } finally {
         if (isMounted) setLoading(false)
       }
@@ -51,12 +46,6 @@ export const PostComments = () => {
       isMounted = false
     }
   }, [postId])
-
-  // Function to refresh comments after adding a new one
-  const refreshComments = async () => {
-    const commentData = await getCommentsByPostId(postId, "author")
-    setComments(Array.isArray(commentData) ? commentData : [])
-  }
 
   const handleCommentChange = (e) => {
     console.log("CHANGE FIRED", e.target.value)
@@ -78,7 +67,6 @@ export const PostComments = () => {
 
     try {
       await createComment(commentData)
-      await refreshComments()
       setNewComment("")
     } catch (error) {
       console.error("Failed to submit comment:", error)
@@ -112,69 +100,8 @@ export const PostComments = () => {
 
     {/* Add spacing before comments */}
     <div className="mt-5">
-
-      {comments.length === 0 ? (
-        <Notification
-          type="info"
-          message="There are no comments for this post yet."
-        />
-      ) : (
-
-        <div className="columns is-multiline">
-
-          {comments.map((comment) => {
-
-            const author =
-              comment.author || comment.user || comment.author_profile || null
-
-            const authorName = author?.first_name
-              ? `${author.first_name}${author.last_name ? ` ${author.last_name}` : ""}`
-              : "Unknown User"
-
-            const isMine =
-              comment.author_id === currentUser?.id ||
-              author?.id === currentUser?.id
-
-            // Center if only one comment exists
-            const columnClass =
-              comments.length === 1
-                ? "column is-half is-offset-one-quarter"
-                : "column is-half"
-
-            return (
-              <div key={comment.id} className={columnClass}>
-
-                <Card
-                  title={`Comment by ${authorName}`}
-                  headerRight={
-                    isMine ? (
-                      <div className="buttons are-small">
-                        <IconButton
-                          icon="gear"
-                          title="Edit comment (coming soon)"
-                          onClick={() => {}}
-                        />
-                        <IconButton
-                          icon="trash"
-                          title="Delete comment (coming soon)"
-                          onClick={() => {}}
-                        />
-                      </div>
-                    ) : null
-                  }
-                >
-                  <p>{comment.content}</p>
-                </Card>
-
-              </div>
-            )
-          })}
-
-        </div>
-
-      )}
-
     </div>
+
   </Container>
-)
+  )
 }

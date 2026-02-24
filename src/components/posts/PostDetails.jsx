@@ -7,7 +7,7 @@ import { getPostByIdExpandCategoryExpandUser } from "../../services";
 // Design system components (Bulma-friendly wrappers)
 import { Container, Loading, Button, IconButton, Card, Tag } from "../../design";
 
-import { DeleteButton } from "../../design/DeleteButton";
+import { DeletePostButton } from "../../design/DeletePostButton";
 
 // New component for Ticket #5 - View Post Details
 // Displays a single post's full details when a user clicks a post title from a list
@@ -93,14 +93,17 @@ export const PostDetails = () => {
             </div>
           </div>
 
-          {/* View Comments goes in the center */}
+          {/* Buttons for the center */}
           <div className="level-item">
-            <Button
-              color="primary"
-              onClick={() => navigate(`/posts/${postId}/comments`)}
-            >
-              View Comments
-            </Button>
+            <div className="buttons">
+              <Button
+                color="primary"
+                onClick={() => navigate(`/posts/${postId}/comments`)}
+              >
+                View Comments
+              </Button>
+              <DeletePostButton userId={post.user_id} postId={post.id} title="Delete Post" confirmTitle="Delete Post" confirmMessage="Are you sure you want to delete this post? This action cannot be undone." />
+            </div>
           </div>
 
           {/* Reactions placeholder on the right */}
@@ -126,9 +129,7 @@ export const PostDetails = () => {
         <div className="content">
           {post.content}
         </div>
-      </Card>
-      <DeleteButton userId={post.user_id} postId={post.id}/>
-      
+      </Card>      
     </Container>
   );
 };

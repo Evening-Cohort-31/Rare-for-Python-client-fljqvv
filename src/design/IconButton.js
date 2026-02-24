@@ -21,7 +21,7 @@ export const IconButton = ({
     return (
         <button
             type="button"
-            className={`button is-white is-small ${colorClass} ${className}`.trim()}
+            className={`button is-small ${colorClass} ${className}`.trim()}
             title={title}
             aria-label={title}
             onClick={onClick}
