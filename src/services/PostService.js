@@ -1,4 +1,4 @@
-import { fetchJson, postJson, putJson } from "./apiSettings";
+import { fetchJson, postJson, putJson, deleteJson } from "./apiSettings";
 
 export function getPostsByUserId(userId) {
     return fetchJson(`/posts?user_id=${userId}`);
@@ -9,9 +9,13 @@ export function getPostsByUserIdExpandCategory(userId) {
 }
 
 export function getAllPosts() {
-    return fetchJson(`/posts?_expand=category`);
+    return fetchJson(`/posts?_expand=category&_expand=user`);
 }
 
+export const deletePost = (postId) => {
+    return deleteJson(`/posts/${postId}`);
+
+}
 export const createPost = (post) => {
     return postJson(`/posts`, post);
 }
@@ -25,7 +29,7 @@ export function getPostByIdExpandCategoryExpandUser(postId) {
 }
 
 export function getPostById(postId) {
-    return fetchJson(`/posts/${postId}`);
+    return fetchJson(`/posts/${postId}?_expand=user`);
 }
 
 export function updatePost(postId, postData) {

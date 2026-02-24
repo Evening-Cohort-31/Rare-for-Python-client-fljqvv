@@ -7,6 +7,8 @@ import { getPostByIdExpandCategoryExpandUser } from "../../services";
 // Design system components (Bulma-friendly wrappers)
 import { Container, Loading, Button, IconButton, Card, Tag } from "../../design";
 
+import { DeleteButton } from "../../design/DeleteButton";
+
 // New component for Ticket #5 - View Post Details
 // Displays a single post's full details when a user clicks a post title from a list
 export const PostDetails = () => {
@@ -125,6 +127,8 @@ export const PostDetails = () => {
           {post.content}
         </div>
       </Card>
+      <DeleteButton userId={post.user_id} postId={post.id}/>
+      
     </Container>
   );
 };

@@ -20,8 +20,8 @@ export const NewCategory = () => {
   };
 
   return (
-    <Container>
-      <PageHeader title="Add New Category" />
+    <div>
+      <h2>Add New Category</h2>
       <form onSubmit={handleSubmit}>
         <FormField label="Category Name">
           <input
@@ -41,6 +41,6 @@ export const NewCategory = () => {
           </div>
         </div>
       </form>
-    </Container>
+    </div>
   );
 }
