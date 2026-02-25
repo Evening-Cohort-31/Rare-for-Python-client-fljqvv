@@ -41,6 +41,7 @@ export const NavBar = ({ token, setToken }) => {
                 <Link to="/all-posts" className="navbar-item">All Posts</Link>
                 <Link to="/bulma-sampler" className="navbar-item">Bulma Sampler</Link>
                 {/* Add additional links for NavBar here */}
+                <Link to="/tags" className="navbar-item">Tag Manager</Link>
               </>
               :
               ""

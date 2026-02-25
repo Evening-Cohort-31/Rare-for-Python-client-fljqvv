@@ -13,6 +13,8 @@ import { PostDetails } from "../components/posts/PostDetails"
 import { CreateAPost } from "../components/posts/CreateAPost"
 import { PostComments } from "../components/comments/PostComments.jsx"
 import { ButtonDemo } from "../design/bulma-reference/ButtonDemo"
+import { TagList } from "../components/tags/TagList.jsx"
+import { NewTag } from "../components/tags/NewTag.jsx"
 
 export const ApplicationViews = ({ token, setToken }) => {
   return <>
@@ -33,6 +35,9 @@ export const ApplicationViews = ({ token, setToken }) => {
         {/* Ticket #5 - Route for viewing a single post's details */}
         <Route path="posts/:postId" element={<PostDetails />} />
         <Route path="posts/:postId/comments" element={<PostComments />} />
+        {/* Ticket #8 - Route for viewing the Tag List */}
+        <Route path="tags" element={<TagList />} />
+        <Route path="tags/new" element={<NewTag />} />
       </Route>
     </Routes>
   </>
