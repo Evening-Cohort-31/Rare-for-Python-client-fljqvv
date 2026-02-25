@@ -1,7 +1,7 @@
 import { fetchJson, postJson, putJson, deleteJson } from "./apiSettings";
 
 export function getPostsByUserId(userId) {
-  return fetchJson(`/posts?user_id=${userId}`);
+    return fetchJson(`/posts?user_id=${userId}`);
 }
 
 export function getPostsByUserIdExpandCategory(userId) {
@@ -17,15 +17,17 @@ export const deletePost = (postId) => {
 
 }
 export const createPost = (post) => {
-  return postJson(`/posts`, post);
+    return postJson(`/posts`, post);
 }
 
-// returns a single post by ID, with the category expanded
 export function getPostByIdExpandCategory(postId) {
     return fetchJson(`/posts/${postId}?_expand=category`);
 }
 
-// Added for Ticket #5 - Fetches a single post by its ID for the PostDetails view
+export function getPostByIdExpandCategoryExpandUser(postId) {
+    return fetchJson(`/posts/${postId}?_expand=category&_expand=user`);
+}
+
 export function getPostById(postId) {
     return fetchJson(`/posts/${postId}?_expand=user`);
 }
