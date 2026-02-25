@@ -41,6 +41,7 @@ export const NavBar = ({ token, setToken }) => {
                 <Link to="/categories" className="navbar-item">Category Management</Link>
                 <Link to="/all-posts" className="navbar-item">All Posts</Link>
                 <Link to="/bulma-sampler" className="navbar-item">Bulma Sampler</Link>
+                <Link to="/tags" className="navbar-item">Tag Manager</Link>
                 {/* add additional non-staff links here */}
 
                 {/* Staff-only links */}
@@ -49,7 +50,6 @@ export const NavBar = ({ token, setToken }) => {
                     <Link to="/users" className="navbar-item">
                       User Profiles
                     </Link>
-
                     {/* Add more staff-only links here */}
                   </>
                 )}

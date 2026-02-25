@@ -16,6 +16,8 @@ import { CreateAPost } from "../components/posts/CreateAPost"
 import { PostComments } from "../components/comments/PostComments.jsx"
 import { ButtonDemo } from "../design/bulma-reference/ButtonDemo"
 import { UserProfiles } from "../components/users/UserProfiles.jsx"
+import { TagList } from "../components/tags/TagList.jsx"
+import { NewTag } from "../components/tags/NewTag.jsx"
 
 export const ApplicationViews = ({ token, setToken }) => {
   return <>
@@ -37,6 +39,8 @@ export const ApplicationViews = ({ token, setToken }) => {
         <Route path="button-demo" element={<ButtonDemo />} />
         <Route path="posts/:postId" element={<PostDetails />} />
         <Route path="posts/:postId/comments" element={<PostComments />} />
+        <Route path="tags" element={<TagList />} />
+        <Route path="tags/new" element={<NewTag />} />
         {/* Add more authenticated routes here */}
 
         {/* Staff-only routes */}
