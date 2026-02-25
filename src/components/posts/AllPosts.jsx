@@ -25,7 +25,7 @@ export const AllPosts = () => {
 
   return (
     <Container>
-      <PageHeader title="All Posts" />
+      <PageHeader title="All Posts" centered />
       <button className="button is-link mb-5" onClick={() => navigate("/posts/new")}>New Post</button>
       <div className="columns is-multiline">
         {posts.map((post) => (
