@@ -5,7 +5,7 @@ export { getUserById } from "./UserService.js";
 export {
   getPostsByUserId,
   getPostsByUserIdExpandCategory,
-  getAllPosts, 
+  getAllPosts,
   createPost,
   getPostByIdExpandCategory,
   getPostById, // Added for Ticket #5 - Post detail view
@@ -14,3 +14,6 @@ export {
 
 // Categories
 export { getAllCategories, createCategory } from "./CategoryService.js";
+
+// Ticket #21 Comments export
+export { getCommentsByPostId } from "./CommentService.js";

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 // useParams lets us read the :postId from the URL (e.g. /posts/5 → postId = "5")
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 // Custom service function we created in PostService.js to fetch a single post by ID
 import { getPostById } from "../../services";
 
@@ -9,6 +9,8 @@ import { getPostById } from "../../services";
 export const PostDetails = () => {
   // Extracts the postId from the URL parameter defined in ApplicationViews route
   const { postId } = useParams();
+  // useNavigate gives us a function to programmatically change the URL
+  const navigate = useNavigate();
   // Holds the fetched post data; starts as null to trigger "Loading..." state
   const [post, setPost] = useState(null);
 
@@ -49,6 +51,11 @@ export const PostDetails = () => {
 
       {/* Full post content/body */}
       <div>{post.content}</div>
+
+      {/* Ticket #21 - Navigates to the comments list for this post */}
+      <button onClick={() => navigate(`/posts/${postId}/comments`)}>
+        View Comments
+      </button>
     </section>
   );
 };
