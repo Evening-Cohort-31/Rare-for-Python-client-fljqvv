@@ -1,5 +1,5 @@
 // Users
-export { getUserById } from "./UserService.js";
+export { getUserById, getAllUsers } from "./UserService.js";
 
 // Posts
 export {
