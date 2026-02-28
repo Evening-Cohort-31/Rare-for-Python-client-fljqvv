@@ -1,4 +1,4 @@
-import { fetchJson, postJson } from "./apiSettings";
+import { fetchJson, postJson, putJson } from "./apiSettings";
 
 // expand supports: "user", "author", and "post"
 // "author" is an alias for "user"
@@ -18,10 +18,19 @@ export function getCommentsByPostId(postId, ...expand) {
   normalized.forEach((e) => {
     params.append("_expand", e);
   });
-
+  
   return fetchJson(`/comments?${params.toString()}`);
 }
 
+
 export function createComment(comment) {
   return postJson("/comments", comment);
+}
+
+export function editComment(commentId, commentData) {
+  return putJson(`/comments/${commentId}`, commentData);
+}
+
+export function getCommentById(id) {
+  return fetchJson(`/comments/${id}?_expand=user`);
 }

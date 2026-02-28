@@ -4,6 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { getPostById, createComment } from "../../services/index.js"
 import { Loading, PageHeader, Container, Button, FormTextarea, Form, FormActions } from "../../design"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
+import { Comments } from "../posts/PostComments.jsx"
 
 export const PostComments = () => {
   const { postId } = useParams()
@@ -100,6 +101,7 @@ export const PostComments = () => {
 
     {/* Add spacing before comments */}
     <div className="mt-5">
+      <Comments />
     </div>
 
   </Container>
