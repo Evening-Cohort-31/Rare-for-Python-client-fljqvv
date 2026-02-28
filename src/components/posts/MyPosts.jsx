@@ -30,12 +30,12 @@ export const MyPosts = () => {
   }, [currentUser]);
 
   if (loading || userLoading) {
-    return <Loading />;
+    return <p>Loading posts...</p>;
   }
 
   return (
     <Container>
-      <PageHeader title="My Posts" />
+      <PageHeader title="My Posts" centered />
       <button className="button is-link mb-5" onClick={() => navigate("/posts/new")}>New Post</button>
       {!posts.length ? (
         <p className="has-text-centered">No posts found.</p>

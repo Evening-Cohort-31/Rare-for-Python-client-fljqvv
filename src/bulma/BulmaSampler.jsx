@@ -1,12 +1,10 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "../../design";
 import "bulma/css/bulma.min.css";
 
 export function BulmaSampler() {
   const [isModalActive, setIsModalActive] = useState(false);
   const [activeTab, setActiveTab] = useState("colors");
-  const navigate = useNavigate();
+
   return (
     <div className="section" style={{ backgroundColor: "#f5f5f5", minHeight: "100vh" }}>
       <div className="container">
@@ -179,7 +177,6 @@ export function BulmaSampler() {
             {/* Buttons */}
             <div className="box mb-6">
               <h2 className="title is-3">Buttons</h2>
-              <div><Button as="a" href="/button-demo" color="info">Button Sampler</Button></div>
               <div className="buttons">
                 <button className="button is-primary">Primary</button>
                 <button className="button is-link">Link</button>

@@ -19,6 +19,12 @@ export const CurrentUserProvider = ({ children }) => {
   const fetchUserData = () => {
     const localUser = localStorage.getItem("auth_token");
 
+    if (!localUser) {
+      setCurrentUser(null);
+      setIsLoading(false);
+      return;
+    }
+
     if (localUser) {
       setIsLoading(true);
       const userObject = JSON.parse(localUser);
