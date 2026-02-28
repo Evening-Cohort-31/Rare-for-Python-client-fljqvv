@@ -6,6 +6,7 @@ import { MyPosts } from "../components/posts/MyPosts"
 import { AllPosts } from "../components/posts/AllPosts"
 import { CategoriesList } from "../components/categories/CategoriesList"
 import { NewCategory } from "../components/categories/NewCategory"
+import { EditCategory } from "../components/categories/EditCategory"
 import { EditPost } from "../components/posts/EditPost"
 import { BulmaSampler } from "../design/bulma-reference/BulmaSampler"
 // Added for Ticket #5 - Import PostDetails component for viewing individual posts
@@ -26,6 +27,7 @@ export const ApplicationViews = ({ token, setToken }) => {
         <Route path="posts/new" element={<CreateAPost />} />
         <Route path="categories" element={<CategoriesList />} />
         <Route path="categories/new" element={<NewCategory />} />
+        <Route path="categories/edit/:categoryId" element={<EditCategory />} />
         <Route path="bulma-sampler" element={<BulmaSampler />} />
         {/* Ticket #5 - Route for viewing a single post's details */}
         <Route path="posts/:postId" element={<PostDetails />} />

@@ -13,4 +13,4 @@ export {
 } from "./PostService.js";
 
 // Categories
-export { getAllCategories, createCategory } from "./CategoryService.js";
+export { getAllCategories, getCategoryById, createCategory, updateCategory } from "./CategoryService.js";
