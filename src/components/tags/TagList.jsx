@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate} from "react-router-dom";
 import { getAllTags } from "../../services/TagService";
-import { Button, Container, PageHeader} from "../../design";
+import { Button, Container, Loading, PageHeader} from "../../design";
+import { useCurrentUser } from "../../context/CurrentUserContext";
 
 export const TagList = () => {
+    const { currentUser } = useCurrentUser();
     const navigate = useNavigate();
 
     const [tags, setTags] = useState([]);
@@ -20,8 +22,13 @@ export const TagList = () => {
         });
     }, []);
 
+    if (!currentUser || !currentUser.is_staff) {
+    navigate("/access-denied", { replace: true })
+    return null
+  }
+
     if (loading) {
-        return <p>Loading tags...</p>;
+        return <Loading />;
     }
 
     if (!tags.length) {
