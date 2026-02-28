@@ -5,7 +5,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getPostByIdExpandCategoryExpandUser } from "../../services";
 
 // Design system components (Bulma-friendly wrappers)
-import { Container, Loading, Button, IconButton, Card, Tag } from "../../design";
+import {
+  Container,
+  Loading,
+  Button,
+  IconButton,
+  Card,
+  Tag,
+} from "../../design";
 
 import { DeletePostButton } from "../../design/DeletePostButton";
 
@@ -34,9 +41,7 @@ export const PostDetails = () => {
       {/* Using a Card here gives you a nice Bulma container + consistent spacing */}
       <Card>
         {/* Post title: centered above the image */}
-        <h1 className="title is-2 has-text-centered mb-4">
-          {post.title}
-        </h1>
+        <h1 className="title is-2 has-text-centered mb-4">{post.title}</h1>
 
         {/* Row above the image:
             - Left: edit/delete icons (dead links for now)
@@ -88,8 +93,8 @@ export const PostDetails = () => {
           {/* Author display name - uses optional chaining (?.) in case user data is missing */}
           <div className="level-left">
             <div>
-              <strong>By:</strong>{" "}
-              {post.user?.first_name} {post.user?.last_name}
+              <strong>By:</strong> {post.user?.first_name}{" "}
+              {post.user?.last_name}
             </div>
           </div>
 
@@ -102,7 +107,13 @@ export const PostDetails = () => {
               >
                 View Comments
               </Button>
-              <DeletePostButton userId={post.user_id} postId={post.id} title="Delete Post" confirmTitle="Delete Post" confirmMessage="Are you sure you want to delete this post? This action cannot be undone." />
+              <DeletePostButton
+                userId={post.user_id}
+                postId={post.id}
+                title="Delete Post"
+                confirmTitle="Delete Post"
+                confirmMessage="Are you sure you want to delete this post? This action cannot be undone."
+              />
             </div>
           </div>
 
@@ -126,10 +137,8 @@ export const PostDetails = () => {
         <hr />
 
         {/* Full post content/body */}
-        <div className="content">
-          {post.content}
-        </div>
-      </Card>      
+        <div className="content">{post.content}</div>
+      </Card>
     </Container>
   );
 };
