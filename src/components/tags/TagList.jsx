@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate} from "react-router-dom";
 import { getAllTags } from "../../services/TagService";
-import { Button, Container, Loading, PageHeader} from "../../design";
+import { Button, Container, Loading, PageHeader, IconButton, Card} from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext";
 
 export const TagList = () => {
@@ -37,20 +37,41 @@ export const TagList = () => {
 
     return (
         <Container>
-            <PageHeader title="Tag List" />
-                <div className="box mb-4">
-                  <table className="table is-fullwidth is-striped is-hoverable">
-                    <tbody>
+            <PageHeader title="Tags" />
+               
                     {tags.map(tag => (
-                        <tr key={tag.id}>
-                            <td className="subtitle is-5">{tag.label}</td>
-                        </tr>
+                        <Card key={tag.id}>
+                                 <article className="media">
+                                   {/* Left: icon buttons */}
+                                   <div className="media-left">
+                                     <div className="buttons are-small">
+                                       <IconButton
+                                         icon="gear"
+                                         title="Edit category (coming soon)"
+                                         onClick={() => {}}
+                                       />
+                                       <IconButton
+                                         icon="trash"
+                                         title="Delete category (coming soon)"
+                                         onClick={() => {}}
+                                       />
+                                     </div>
+                                   </div>
+                       
+                                   {/* Main: tag label */}
+                                   <div className="media-content">
+                                     <div className="content">
+                                       <p className="mb-0">
+                                         <span className="has-text-weight-semibold">{tag.label}</span>
+                                         <hr className="my-2" />
+                                       </p>
+                                     </div>
+                                   </div>
+                                 </article>
+                        </Card>
                     ))}
-                    </tbody>
-                </table>
-                </div>
-                <div className="is-centered">
-                    <Button className="button is-link mb-5" onClick={() => navigate("/tags/new")}>Create a Tag</Button>
+                <div className="mt-4 mb-4">
+                    <Button color="primary" onClick={() => navigate("/tags/new")}>Create a Tag</Button>
                 </div>
         </Container>
  
