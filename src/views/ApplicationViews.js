@@ -2,6 +2,8 @@ import { Route, Routes, Navigate } from "react-router-dom"
 import { Login } from "../components/auth/Login"
 import { Register } from "../components/auth/Register"
 import { Authorized } from "./Authorized"
+import { StaffOnly } from "../components/auth/StaffOnly.jsx"
+import { AccessDenied } from "../components/auth/AccessDenied.jsx"
 import { MyPosts } from "../components/posts/MyPosts"
 import { AllPosts } from "../components/posts/AllPosts"
 import { CategoriesList } from "../components/categories/CategoriesList"
@@ -13,17 +15,20 @@ import { PostDetails } from "../components/posts/PostDetails"
 import { CreateAPost } from "../components/posts/CreateAPost"
 import { PostComments } from "../components/comments/PostComments.jsx"
 import { ButtonDemo } from "../design/bulma-reference/ButtonDemo"
+import { UserProfiles } from "../components/users/UserProfiles.jsx"
 import { TagList } from "../components/tags/TagList.jsx"
 import { NewTag } from "../components/tags/NewTag.jsx"
 
 export const ApplicationViews = ({ token, setToken }) => {
   return <>
     <Routes>
-      <Route path="/" element={<Navigate to="/my-posts" replace />} />
       <Route path="/login" element={<Login setToken={setToken} />} />
       <Route path="/register" element={<Register setToken={setToken} />} />
-      <Route element={<Authorized token={token} />}>
-        {/* Add additional route here */}
+      <Route path="/access-denied" element={<AccessDenied />} />
+
+      <Route element={<Authorized />}>
+        {/* Normal Authenticated Routes here */}
+        <Route path="/" element={<Navigate to="/my-posts" />} />
         <Route path="my-posts" element={<MyPosts />} />
         <Route path="my-posts/edit/:postId" element={<EditPost />} />
         <Route path="all-posts" element={<AllPosts />} />
@@ -32,12 +37,17 @@ export const ApplicationViews = ({ token, setToken }) => {
         <Route path="categories/new" element={<NewCategory />} />
         <Route path="bulma-sampler" element={<BulmaSampler />} />
         <Route path="button-demo" element={<ButtonDemo />} />
-        {/* Ticket #5 - Route for viewing a single post's details */}
         <Route path="posts/:postId" element={<PostDetails />} />
         <Route path="posts/:postId/comments" element={<PostComments />} />
-        {/* Ticket #8 - Route for viewing the Tag List */}
         <Route path="tags" element={<TagList />} />
         <Route path="tags/new" element={<NewTag />} />
+        {/* Add more authenticated routes here */}
+
+        {/* Staff-only routes */}
+        <Route element={<StaffOnly />}>
+          <Route path="/users" element={<UserProfiles />} />
+          {/* Add more staff-only pages here */}
+        </Route>
       </Route>
     </Routes>
   </>
