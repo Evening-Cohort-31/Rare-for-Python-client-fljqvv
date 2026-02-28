@@ -1,14 +1,78 @@
-import { useNavigate } from "react-router-dom"
-import { Button, Container, PageHeader} from "../../design";
+import { useEffect, useState } from "react";
+import { useNavigate} from "react-router-dom";
+import { getAllTags } from "../../services/TagService";
+import { Button, Container, Loading, PageHeader, IconButton, Card} from "../../design";
+import { useCurrentUser } from "../../context/CurrentUserContext";
 
 export const TagList = () => {
+    const { currentUser } = useCurrentUser();
     const navigate = useNavigate();
+
+    const [tags, setTags] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getAllTags().then(fetchedTags => {
+            setTags(fetchedTags);
+            setLoading(false);
+        }).catch(error => {
+            console.error("Failed to fetch tags:", error);
+            setTags([]);
+            setLoading(false);
+        });
+    }, []);
+
+    if (!currentUser || !currentUser.is_staff) {
+    navigate("/access-denied", { replace: true })
+    return null
+  }
+
+    if (loading) {
+        return <Loading />;
+    }
+
+    if (!tags.length) {
+        return <p>There are no tags available. Click the button below to start adding new tags.</p>;
+    }
 
     return (
         <Container>
-            <PageHeader title="Tag List" />
-            {/* A List of all Tags will display here. Ticket #10 */}
-            <Button onClick={() => navigate("/tags/new")}>Create a Tag</Button>
+            <PageHeader title="Tags" />
+               
+                    {tags.map(tag => (
+                        <Card key={tag.id}>
+                                 <article className="media">
+                                   {/* Left: icon buttons */}
+                                   <div className="media-left">
+                                     <div className="buttons are-small">
+                                       <IconButton
+                                         icon="gear"
+                                         title="Edit category (coming soon)"
+                                         onClick={() => {}}
+                                       />
+                                       <IconButton
+                                         icon="trash"
+                                         title="Delete category (coming soon)"
+                                         onClick={() => {}}
+                                       />
+                                     </div>
+                                   </div>
+                       
+                                   {/* Main: tag label */}
+                                   <div className="media-content">
+                                     <div className="content">
+                                       <p className="mb-0">
+                                         <span className="has-text-weight-semibold">{tag.label}</span>
+                                         <hr className="my-2" />
+                                       </p>
+                                     </div>
+                                   </div>
+                                 </article>
+                        </Card>
+                    ))}
+                <div className="mt-4 mb-4">
+                    <Button color="primary" onClick={() => navigate("/tags/new")}>Create a Tag</Button>
+                </div>
         </Container>
  
     )
