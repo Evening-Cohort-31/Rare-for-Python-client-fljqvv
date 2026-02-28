@@ -1,0 +1,19 @@
+.button {
+  transition: all 0.2s ease-in-out;
+}
+
+.button:hover:not(.is-static):not([disabled]) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15);
+  filter: brightness(1.05);
+}
+
+.button:active:not(.is-static):not([disabled]) {
+  transform: translateY(0);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.button:focus-visible {
+  outline: 3px solid rgba(0, 150, 136, 0.5);
+  outline-offset: 2px;
+}

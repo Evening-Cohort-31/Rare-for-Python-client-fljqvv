@@ -1,3 +1,5 @@
+import "./design.css"
+
 export { FormField } from "./FormField"
 export { FormTextarea } from "./FormTextarea"
 export { FormSelect } from "./FormSelect"

@@ -1,5 +1,5 @@
 // Users
-export { getUserById, getAllUsers } from "./UserService.js";
+export { getUserById, getAllUsers, updateUser, getActiveUsers, getInactiveUsers } from "./UserService.js";
 
 // Posts
 export {
