@@ -1,34 +1,36 @@
 // Ticket #21 - View Comments list page for a given post
-import { useEffect, useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useEffect, useState, useCallback } from "react";
+import { useParams } from "react-router-dom";
 import { getPostById, getCommentsByPostId } from "../../services";
 import { Container, IconButton } from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext";
+import { EditCommentButton } from "./EditCommentButton";
 
 
-export const Comments = () => {
+export const CommentList = () => {
   const { postId } = useParams();
   const { currentUser } = useCurrentUser();
-  const navigate = useNavigate();
 
   const [post, setPost] = useState(null);
   const [comments, setComments] = useState(null);
 
-  useEffect(() => {
-    // Fetch #1: get the post so we can display its title and build the back link
-    getPostById(postId).then(setPost);
+  //Moved the comments fetching logic into a separate function so it can be called both on initial load and after posting a new comment to refresh the list.
 
-    // Fetch #2: get all comments for this post, then sort before storing
+  const getAndSetComments = useCallback(() => {
     getCommentsByPostId(postId, "author").then((data) => {
-      // data.sort() compares two comments (a, b) at a time
-      // Subtracting dates gives a number — if b is newer, the result is positive
-      // A positive result tells sort() to place b before a (most recent on top)
       const sorted = data.sort(
         (a, b) => new Date(b.created_on) - new Date(a.created_on),
       );
       setComments(sorted);
     });
   }, [postId]);
+
+  useEffect(() => {
+    // Fetch #1: get the post so we can display its title and build the back link
+    getPostById(postId).then(setPost);
+    // Fetch #2: get all comments for this post, then sort before storing
+    getAndSetComments();    
+  }, [postId, getAndSetComments]); // Re-run this effect if postId changes or comments are updated (e.g. after posting a new comment)
 
   // Guard: if either API call hasn't finished yet, both will still be null
   // Returning early here prevents the JSX below from trying to read data that doesn't exist yet
@@ -44,8 +46,9 @@ export const Comments = () => {
 
       {/* .map() loops over the sorted comments array and returns JSX for each one */}
       {/* key={comment.id} is required by React to track list items efficiently */}
+      <div className="columns is-multiline">
       {comments.map((comment) => (
-        <div className="mb-6" key={comment.id}>
+        <div className="column is-half mb-6" key={comment.id}>
           
           <article className="message is-info">
          
@@ -58,19 +61,21 @@ export const Comments = () => {
               <div className="buttons are-small">
                 {comment.author_id === currentUser?.id && (
                   <>
+                    {/* Replaced empty Icon Button with function EditCommentButton component. */}
+                    <EditCommentButton
+                      icon="gear"
+                      title="Edit Comment"
+                      commentId={comment.id}
+                      // onUpdate is a callback prop that EditCommentButton will call after successfully saving edits, which triggers this parent component to re-fetch the comments list and show the updated content without needing a full page refresh.
+                      onUpdate={getAndSetComments}/>
                     <IconButton
-                                                       icon="gear"
-                                                       title="Edit comment (coming soon)"
-                                                       onClick={() => navigate(`/comments/${comment.id}/edit`)}
-                                                     />
-                                                     <IconButton
-                                                       icon="trash"
-                                                       title="Delete comment (coming soon)"
-                                                       onClick={() => {}}
-                                                     /> 
-                                                     </> 
-                                                  )}
-                                                   </div>
+                      icon="trash"
+                      title="Delete comment (coming soon)"
+                      onClick={() => {}}
+                    /> 
+                  </> 
+                )}
+              </div>
               
           </div>
           {/* Full body/content of the comment */}
@@ -89,6 +94,7 @@ export const Comments = () => {
           </article>
         </div>
       ))}
+      </div>
     </Container>
   );
 };

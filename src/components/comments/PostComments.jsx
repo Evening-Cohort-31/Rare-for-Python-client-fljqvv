@@ -4,7 +4,7 @@ import { useNavigate, useParams } from "react-router-dom"
 import { getPostById, createComment } from "../../services/index.js"
 import { Loading, PageHeader, Container, Button, FormTextarea, Form, FormActions } from "../../design"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
-import { Comments } from "../posts/PostComments.jsx"
+import { CommentList } from "./CommentList.jsx"
 
 export const PostComments = () => {
   const { postId } = useParams()
@@ -13,6 +13,8 @@ export const PostComments = () => {
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const { currentUser } = useCurrentUser()
+  // State to track if a comment was just posted and trigger re-load of comments list
+  const [postedComment, setPostedComment] = useState(false) 
 
   // Memoize numeric postId to avoid unnecessary re-renders in useEffect dependencies
   const numericPostId = useMemo(() => parseInt(postId, 10), [postId])
@@ -36,6 +38,7 @@ export const PostComments = () => {
         ])
         if (!isMounted) return
         setPost(postData)
+        setPostedComment(false) // Resets postedComment flag to false after reload
       } finally {
         if (isMounted) setLoading(false)
       }
@@ -46,7 +49,7 @@ export const PostComments = () => {
     return () => {
       isMounted = false
     }
-  }, [postId])
+  }, [postId, postedComment]) // Re-load page when postId changes or a new comment is posted
 
   const handleCommentChange = (e) => {
     console.log("CHANGE FIRED", e.target.value)
@@ -69,6 +72,7 @@ export const PostComments = () => {
     try {
       await createComment(commentData)
       setNewComment("")
+      setPostedComment(true) // Set flag to true after successful submission to re-load the page with new comment
     } catch (error) {
       console.error("Failed to submit comment:", error)
     }
@@ -77,9 +81,12 @@ export const PostComments = () => {
   if (loading) return <Loading />
 
   return (
+    
   <Container>
+    {/*Header with post tile and content for Post that was chosen */}
     <PageHeader title={`Comments for: ${post?.title || "Unknown Post"}`} />
 
+    {/*Form to add a new comment to the post */}
     <Form onSubmit={handleCommentSubmit}>
       <FormTextarea
         name="comment"
@@ -99,9 +106,9 @@ export const PostComments = () => {
       </FormActions>
     </Form>
 
-    {/* Add spacing before comments */}
+    {/*Display mapped comments for the current post using Comments component from posts/PostComments.jsx */}
     <div className="mt-5">
-      <Comments />
+      <CommentList />
     </div>
 
   </Container>
