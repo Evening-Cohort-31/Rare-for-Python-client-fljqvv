@@ -1,6 +1,7 @@
 import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { loginUser } from "../../managers/AuthManager"
+import { getUserById } from "../../services"
 import { QuickLogin } from "./QuickLogin"
 import { useCurrentUser } from "../../context/CurrentUserContext"
 
@@ -22,7 +23,7 @@ export const Login = ({ setToken }) => {
   const [isUnsuccessful, setisUnsuccessful] = useState(false)
   const { fetchUserData } = useCurrentUser()
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
 
     const user = {
@@ -30,16 +31,19 @@ export const Login = ({ setToken }) => {
       password: password.current.value
     }
 
-    loginUser(user).then(res => {
-      if ("valid" in res && res.valid) {
-        setToken(res.token)
-        fetchUserData()
-        navigate("/")
-      }
-      else {
+    const res = await loginUser(user)
+    if ("valid" in res && res.valid) {
+      const userData = await getUserById(res.token)
+      if (!userData.active) {
         setisUnsuccessful(true)
+        return
       }
-    })
+      setToken(res.token)
+      fetchUserData()
+      navigate("/")
+    } else {
+      setisUnsuccessful(true)
+    }
   }
 
   return (
