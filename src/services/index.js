@@ -10,7 +10,8 @@ export {
   getPostByIdExpandCategory,
   getPostByIdExpandCategoryExpandUser,
   getPostById, // Added for Ticket #5 - Post detail view
-  updatePost, deletePost,
+  updatePost,
+  deletePost,
 } from "./PostService.js";
 
 // Categories
