@@ -19,3 +19,9 @@ export { getAllCategories, createCategory } from "./CategoryService.js";
 
 // Comments
 export { getCommentsByPostId, createComment } from "./CommentService.js";
+
+// Reactions
+export { getAllReactions } from "./ReactionService.js";
+
+// PostReactions
+export { getAllPostReactions, getPostReactionsByPostId, updateOrCreatePostReaction } from "./PostReactionService.js";
