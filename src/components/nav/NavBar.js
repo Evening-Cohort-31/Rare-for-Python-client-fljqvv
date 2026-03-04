@@ -41,7 +41,9 @@ export const NavBar = ({ token, setToken }) => {
                 <Link to="/categories" className="navbar-item">Category Management</Link>
                 <Link to="/all-posts" className="navbar-item">All Posts</Link>
                 <Link to="/bulma-sampler" className="navbar-item">Bulma Sampler</Link>
-                <Link to="/profile/me" className="navbar-item">My Profile</Link>
+                {currentUser?.id && (
+                  <Link to={`/users/${currentUser.id}`} className="navbar-item">My Profile</Link>
+                )}
                 {/* add additional non-staff links here */}
 
                 {/* Staff-only links */}

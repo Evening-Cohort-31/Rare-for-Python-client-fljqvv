@@ -1,16 +1,21 @@
-import { Button, Card, Container } from "../../design"
+import { Button, Card, Container, Loading } from "../../design"
 import { Link, useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { getUserById } from "../../services"
+import { ProfileImage } from "./ProfileImage.jsx"
 
 export const UserDetails = () => {
 
     const {userId} = useParams()
-    const [author, setAuthor] = useState({})
+    const [author, setAuthor] = useState(null)
+    // Loading state to handle ProfileImage's internal loading state and avoid showing "No user data" message while fetching
+    const [loading, setLoading] = useState(true)
 
     useEffect(()=>{
-        getUserById(parseInt(userId)).then((fetchedAuthor) => {
-        setAuthor(fetchedAuthor)})
+        setLoading(true)
+        getUserById(parseInt(userId))
+            .then((fetchedAuthor) => setAuthor(fetchedAuthor))
+            .finally(() => setLoading(false))
     },[userId])
 
     const formatDate = (dateString) => {
@@ -18,12 +23,15 @@ export const UserDetails = () => {
         return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
     };
 
+    if (loading) return <Loading />
+
     return (
         <Container>
             <Card>
                 <div className="columns">
                     <div className="column is-3">
-                        <img src={author.profile_image_url} alt={`${author.first_name} ${author.last_name}`} className="mb-4 rounded-full w-32 h-32 object-cover" />
+                        {/* component for profile image with built in loading and error handling */}
+                        <ProfileImage user={author} />
                         <p className="has-text-grey is-size-10 mb-2">{author.first_name} {author.last_name}</p>
                     </div>
                     <div className="column is-3">
