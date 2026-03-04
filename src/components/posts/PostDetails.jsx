@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 // useParams lets us read the :postId from the URL (e.g. /posts/5 → postId = "5")
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 // Custom service function we created in PostService.js to fetch a single post by ID
 import { getPostByIdExpandCategoryExpandUser } from "../../services";
 
@@ -15,6 +15,7 @@ import {
 } from "../../design";
 
 import { DeletePostButton } from "../../design/DeletePostButton";
+import { ReactionBar } from "../reactions/ReactionBar.jsx";
 
 // New component for Ticket #5 - View Post Details
 // Displays a single post's full details when a user clicks a post title from a list
@@ -91,11 +92,12 @@ export const PostDetails = () => {
         */}
         <nav className="level mb-5">
           {/* Author display name - uses optional chaining (?.) in case user data is missing */}
+          {/* Made authors name into a link to their profile */}
           <div className="level-left">
-            <div>
+            <Link to={`/users/${post.user_id}`} className="has-text-weight-semibold">
               <strong>By:</strong> {post.user?.first_name}{" "}
               {post.user?.last_name}
-            </div>
+            </Link>
           </div>
 
           {/* Buttons for the center */}
@@ -119,18 +121,8 @@ export const PostDetails = () => {
 
           {/* Reactions placeholder on the right */}
           <div className="level-right">
-            {/* Placeholder until reactions are built */}
-            <div className="tags">
-              <Tag light>😀</Tag>
-              <Tag light>🔥</Tag>
-              <Tag light>🎉</Tag>
-              <Tag rounded>
-                <span className="icon is-small mr-1">
-                  <i className="fas fa-heart"></i>
-                </span>
-                7
-              </Tag>
-            </div>
+            {/* Use ReactionBar component here, passing the postId as a prop */}
+            <ReactionBar postId={postId} />
           </div>
         </nav>
 

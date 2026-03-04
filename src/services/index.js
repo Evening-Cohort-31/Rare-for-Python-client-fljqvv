@@ -15,7 +15,17 @@ export {
 } from "./PostService.js";
 
 // Categories
-export { getAllCategories, createCategory } from "./CategoryService.js";
+export {
+  getAllCategories,
+  createCategory,
+  deleteCategory, // Added for Ticket #16 - Delete a Category
+} from "./CategoryService.js";
 
 // Comments
 export { getCommentsByPostId, createComment } from "./CommentService.js";
+
+// Reactions
+export { getAllReactions } from "./ReactionService.js";
+
+// PostReactions
+export { getAllPostReactions, getPostReactionsByPostId, updateOrCreatePostReaction } from "./PostReactionService.js";

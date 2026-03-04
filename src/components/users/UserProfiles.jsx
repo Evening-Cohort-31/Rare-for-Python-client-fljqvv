@@ -1,6 +1,6 @@
 // Component for displaying all user profiles.
 import { useEffect, useState, useRef } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { getAllUsers, getInactiveUsers, getActiveUsers, updateUser } from "../../services/index.js"
 import { Loading, PageHeader, Container, Card, ConfirmDialog, Button} from "../../design"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
@@ -139,7 +139,7 @@ if (!currentUser || !currentUser.is_staff) {
           {users.map((user) => (
             <tr key={user.id}>
               {/* Username */}
-              <td>{user.username}</td>
+              <td><Link to={`/users/${user.id}`}>{user.username}</Link></td>
 
               {/* User Name */}
               <td>
