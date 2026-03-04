@@ -15,6 +15,7 @@ import {
 } from "../../design";
 
 import { DeletePostButton } from "../../design/DeletePostButton";
+import { ReactionBar } from "../reactions/ReactionBar.jsx";
 
 // New component for Ticket #5 - View Post Details
 // Displays a single post's full details when a user clicks a post title from a list
@@ -119,18 +120,8 @@ export const PostDetails = () => {
 
           {/* Reactions placeholder on the right */}
           <div className="level-right">
-            {/* Placeholder until reactions are built */}
-            <div className="tags">
-              <Tag light>😀</Tag>
-              <Tag light>🔥</Tag>
-              <Tag light>🎉</Tag>
-              <Tag rounded>
-                <span className="icon is-small mr-1">
-                  <i className="fas fa-heart"></i>
-                </span>
-                7
-              </Tag>
-            </div>
+            {/* Use ReactionBar component here, passing the postId as a prop */}
+            <ReactionBar postId={postId} />
           </div>
         </nav>
 

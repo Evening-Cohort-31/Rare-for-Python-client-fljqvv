@@ -3,8 +3,8 @@ import { useNavigate, Link } from "react-router-dom";
 import { getAllPosts } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 // CHANGED: Added Link alongside useNavigate (Added on view_post_details_5)
-import { Loading, PageHeader, Card, Container } from "../../design";;
-
+import { Loading, PageHeader, Card, Container } from "../../design";
+import { ReactionBar } from "../reactions/ReactionBar.jsx";
 
 export const AllPosts = () => {
   const { currentUser } = useCurrentUser();
@@ -48,6 +48,10 @@ export const AllPosts = () => {
                 </button>
                     )}
              </div>
+             <hr />
+                <div className="mt-3">
+                  <ReactionBar postId={post.id} />
+                </div>
           </Card>
           </div>
         ))}
