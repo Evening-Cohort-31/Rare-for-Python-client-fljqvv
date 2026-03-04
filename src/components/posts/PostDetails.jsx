@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 // useParams lets us read the :postId from the URL (e.g. /posts/5 → postId = "5")
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 // Custom service function we created in PostService.js to fetch a single post by ID
 import { getPostByIdExpandCategoryExpandUser } from "../../services";
 
@@ -91,11 +91,12 @@ export const PostDetails = () => {
         */}
         <nav className="level mb-5">
           {/* Author display name - uses optional chaining (?.) in case user data is missing */}
+          {/* Made authors name into a link to their profile */}
           <div className="level-left">
-            <div>
+            <Link to={`/users/${post.user_id}`} className="has-text-weight-semibold">
               <strong>By:</strong> {post.user?.first_name}{" "}
               {post.user?.last_name}
-            </div>
+            </Link>
           </div>
 
           {/* Buttons for the center */}
