@@ -1,3 +1,6 @@
+// API service exports
+export { API_BASE_URL } from "./apiSettings.js";
+
 // Users
 export { getUserById, getAllUsers, updateUser, getActiveUsers, getInactiveUsers } from "./UserService.js";
 
@@ -25,3 +28,6 @@ export { getAllReactions } from "./ReactionService.js";
 
 // PostReactions
 export { getAllPostReactions, getPostReactionsByPostId, updateOrCreatePostReaction } from "./PostReactionService.js";
+
+// Images/Avatars
+export { getAvatars } from "./ImageService.js";
