@@ -4,35 +4,26 @@ import { getCommentById, editComment } from "../../services/CommentService";
 
 export const EditCommentButton = ({ icon, title, commentId, onUpdate }) => {
     const [comment, setComment] = useState(null);
-    const [loading, setLoading] = useState(true);
+    const [isOpen, setIsOpen] = useState(false); 
     const dialogRef = useRef(null);
 
-    // Function to open the dialog when the edit button is clicked
     const openDialog = () => {
-        dialogRef.current?.showModal();
-    };
-    
-    // This useEffect fetches the comment data when the component mounts or when commentId changes, so we have the latest content to edit
-    useEffect(() => {
         getCommentById(commentId).then(fetchedComment => {
             setComment(fetchedComment);
-            setLoading(false);
+            setIsOpen(true);
         }).catch(error => {
             console.error("Failed to fetch comment:", error);
-            setComment(null);
-            setLoading(false);
+            setComment(null);   
         });
-    }, [commentId]);
+    };
     
-    if (loading) {
-        return null;  
-    }   
-
-    if (!comment) {
-        return null;  
-    }   
-
-    // Handles the form submission to save the edited comment. It calls the editComment service and then triggers the onUpdate callback to refresh the comments list in the parent component, and finally closes the dialog.
+    useEffect(() => {
+        if (isOpen && dialogRef.current) {  
+        dialogRef.current?.showModal(); 
+        setIsOpen(false);
+        }           
+    }, [isOpen]);
+    
     const handleSubmit = async () => {
 
         const commentData = {
@@ -45,8 +36,7 @@ export const EditCommentButton = ({ icon, title, commentId, onUpdate }) => {
             author: comment.author
         };
         await editComment(commentId, commentData).then(() => {
-            getCommentById(commentId).then(setComment);
-            onUpdate?.(); // triggers parent to re-fetch
+            onUpdate?.(); 
             dialogRef.current?.close();
         }).catch(error => {
           console.error("Failed to update comment:", error);
@@ -55,11 +45,8 @@ export const EditCommentButton = ({ icon, title, commentId, onUpdate }) => {
 
     return (
         <>
-            {/* IconButton is a reusable component that takes props for icon and title. When clicked, it opens the dialog for editing the comment. */}
 
             <IconButton icon={icon} title={title} onClick={openDialog} />
-            
-            {/* ConfirmDialog is a reusable component that renders a <dialog> with customizable title, message, and confirm/cancel buttons. In this case, the message prop contains the form fields for editing the comment content and subject. When the user clicks "Save Changes", it calls handleSubmit to save the edits. */}
 
             <ConfirmDialog
                 dialogRef={dialogRef}
@@ -69,14 +56,14 @@ export const EditCommentButton = ({ icon, title, commentId, onUpdate }) => {
                     <span className="mb-2">Content:</span>
                     <textarea
                         className="textarea mb-2"
-                        value={comment.content}
+                        value={comment?.content ?? ""}
                         onChange={(e) => setComment({...comment, content: e.target.value})}
                         rows={1}
                     />
                     <span className="mb-2">Subject:</span>
                     <textarea
                         className="textarea mb-2"
-                        value={comment.subject || ""}
+                        value={comment?.subject ?? ""}
                         onChange={(e) => setComment({...comment, subject: e.target.value})}
                         rows={1}
                     />

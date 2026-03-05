@@ -1,7 +1,7 @@
 //Component for a form to create a new tag and submit it to the API
 
 import { useState } from "react";
-import { createTag } from "../../services/TagService";
+import { createTag } from "../../services";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, FormField, PageHeader } from "../../design";
 

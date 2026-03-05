@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate} from "react-router-dom";
-import { getAllTags } from "../../services/TagService";
+import { getAllTags } from "../../services";
 import { Button, Container, Loading, PageHeader, IconButton, Card} from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext";
 import { EditTagButton } from "./EditTagButton";
