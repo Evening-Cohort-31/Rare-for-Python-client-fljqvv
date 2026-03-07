@@ -31,7 +31,7 @@ export {
 export { getCommentsByPostId, createComment } from "./CommentService.js";
 
 // Reactions
-export { getAllReactions } from "./ReactionService.js";
+export { getAllReactions, createReaction } from "./ReactionService.js";
 
 // PostReactions
 export {
