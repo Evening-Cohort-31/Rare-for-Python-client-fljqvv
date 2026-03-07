@@ -37,4 +37,4 @@ export { getAllPostReactions, getPostReactionsByPostId, updateOrCreatePostReacti
 export { getAllTags, createTag, getTagById, editTag } from "./TagService.js";
 
 // Images/Avatars
-export { getAvatars } from "./ImageService.js";
+export { getAvatars, uploadFile } from "./ImageService.js";

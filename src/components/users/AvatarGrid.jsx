@@ -1,6 +1,6 @@
 import { buildImageSrc } from "../utils/imageUtils.js"
 
-export const AvatarGrid = ({ avatars, isLoadingAvatars, isSaving, currentImgSrc, onLoadAvatars, onPickAvatar }) => {
+export const AvatarGrid = ({ avatars, isLoadingAvatars, isSaving, currentImgSrc, onLoadAvatars, onPickURL }) => {
   const isSelected = (avatarUrl) => avatarUrl && currentImgSrc && avatarUrl === currentImgSrc
 
   return (
@@ -27,7 +27,7 @@ export const AvatarGrid = ({ avatars, isLoadingAvatars, isSaving, currentImgSrc,
           <button
             key={avatarUrl}
             type="button"
-            onClick={() => onPickAvatar(avatarUrl)}
+            onClick={() => onPickURL(avatarUrl)}
             className="button is-white p-2"
             disabled={isSaving}
             style={{

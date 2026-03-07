@@ -6,3 +6,12 @@ export const buildImageSrc = (url) => {
     if (url.startsWith("http")) return url
     return `${API_BASE_URL}${url}`
 }
+
+export const isImageUrl = (url) => {
+    try {
+        const { pathname } = new URL(url)
+        return /\.(png|jpe?g|gif|webp|svg|avif|bmp|ico)$/i.test(pathname)
+    } catch {
+        return false
+    }
+}
