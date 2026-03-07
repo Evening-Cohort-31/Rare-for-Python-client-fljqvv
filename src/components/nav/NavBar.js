@@ -8,7 +8,7 @@ export const NavBar = ({ token, setToken }) => {
   const navigate = useNavigate()
   const navbar = useRef()
   const hamburger = useRef()
-  const { setCurrentUser } = useCurrentUser()
+  const { currentUser, setCurrentUser } = useCurrentUser()
 
   const showMobileNavbar = () => {
     hamburger.current.classList.toggle('is-active')
@@ -36,11 +36,23 @@ export const NavBar = ({ token, setToken }) => {
             token
               ?
               <>
+                {/* Non-staff user links */}
                 <Link to="/my-posts" className="navbar-item">My Posts</Link>
                 <Link to="/categories" className="navbar-item">Category Management</Link>
                 <Link to="/all-posts" className="navbar-item">All Posts</Link>
                 <Link to="/bulma-sampler" className="navbar-item">Bulma Sampler</Link>
-                {/* Add additional links for NavBar here */}
+                {/* add additional non-staff links here */}
+
+                {/* Staff-only links */}
+                {currentUser?.is_staff && (
+                  <>
+                    <Link to="/users" className="navbar-item">
+                      User Profiles
+                    </Link>
+                    <Link to="/tags" className="navbar-item">Tag Manager</Link>
+                    {/* Add more staff-only links here */}
+                  </>
+                )}
               </>
               :
               ""

@@ -1,58 +1,136 @@
 import { useEffect, useState } from "react";
 // useParams lets us read the :postId from the URL (e.g. /posts/5 → postId = "5")
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 // Custom service function we created in PostService.js to fetch a single post by ID
-import { getPostById } from "../../services";
+import { getPostByIdExpandCategoryExpandUser } from "../../services";
 
-import { DeleteButton } from "../../design/DeleteButton";
+// Design system components (Bulma-friendly wrappers)
+import {
+  Container,
+  Loading,
+  Button,
+  IconButton,
+  Card,
+  Tag,
+} from "../../design";
+
+import { DeletePostButton } from "../../design/DeletePostButton";
+import { ReactionBar } from "../reactions/ReactionBar.jsx";
 
 // New component for Ticket #5 - View Post Details
 // Displays a single post's full details when a user clicks a post title from a list
 export const PostDetails = () => {
   // Extracts the postId from the URL parameter defined in ApplicationViews route
   const { postId } = useParams();
+  const navigate = useNavigate();
   // Holds the fetched post data; starts as null to trigger "Loading..." state
   const [post, setPost] = useState(null);
 
   // Fetches the single post from the API when component mounts or postId changes
   useEffect(() => {
-    getPostById(postId).then(setPost);
+    getPostByIdExpandCategoryExpandUser(postId).then(setPost);
   }, [postId]);
 
   // Show loading message while waiting for API response (post is still null)
-  if (!post) return <p>Loading...</p>;
+  if (!post) return <Loading />;
+
+  // Defensive fallback if your API hasn't expanded category yet
+  const categoryLabel = post?.category?.label || "Uncategorized";
 
   return (
-    <section className="post-detail">
-      {/* Post title */}
-      <h1>{post.title}</h1>
+    <Container>
+      {/* Using a Card here gives you a nice Bulma container + consistent spacing */}
+      <Card>
+        {/* Post title: centered above the image */}
+        <h1 className="title is-2 has-text-centered mb-4">{post.title}</h1>
 
-      {/* Only render the header image if the post has an image_url */}
-      {post.image_url ? (
-        <img
-          src={post.image_url}
-          alt="Post header"
-          style={{ maxWidth: "100%" }}
-        />
-      ) : null}
+        {/* Row above the image:
+            - Left: edit/delete icons (dead links for now)
+            - Right: category label
+        */}
+        <div className="level mb-3">
+          <div className="level-left">
+            <div className="buttons are-small">
+              {/* "Edit post" (dead for now) */}
+              <IconButton
+                icon="gear"
+                title="Edit post (coming soon)"
+                onClick={() => {}}
+              />
+              {/* "Delete post" (dead for now) */}
+              <IconButton
+                icon="trash"
+                title="Delete post (coming soon)"
+                onClick={() => {}}
+              />
+            </div>
+          </div>
 
-      {/* Author display name - uses optional chaining (?.) in case user data is missing */}
-      <div>
-        <strong>By:</strong> {post.user?.first_name}
-      </div>
+          <div className="level-right">
+            {/* Category label on the right above the image */}
+            <Tag color="info" light rounded>
+              {categoryLabel}
+            </Tag>
+          </div>
+        </div>
 
-      {/* Publication date formatted as MM/DD/YYYY using toLocaleDateString */}
-      <div>
-        <strong>Published:</strong>{" "}
-        {new Date(post.publication_date).toLocaleDateString("en-US")}
-      </div>
+        {/* Only render the header image if the post has an image_url */}
+        {post.image_url ? (
+          <figure className="image mb-4">
+            <img
+              src={post.image_url}
+              alt="Post header"
+              style={{ width: "100%", borderRadius: "8px" }}
+            />
+          </figure>
+        ) : null}
 
-      <hr />
+        {/* Row under the image:
+            - Left: author name
+            - Center: View Comments button
+            - Right: reactions placeholder (we'll wire later)
+        */}
+        <nav className="level mb-5">
+          {/* Author display name - uses optional chaining (?.) in case user data is missing */}
+          {/* Made authors name into a link to their profile */}
+          <div className="level-left">
+            <Link to={`/users/${post.user_id}`} className="has-text-weight-semibold">
+              <strong>By:</strong> {post.user?.first_name}{" "}
+              {post.user?.last_name}
+            </Link>
+          </div>
 
-      {/* Full post content/body */}
-      <div>{post.content}</div>
-      <DeleteButton userId={post.user_id} postId={post.id}/>
-      
-    </section>
+          {/* Buttons for the center */}
+          <div className="level-item">
+            <div className="buttons">
+              <Button
+                color="primary"
+                onClick={() => navigate(`/posts/${postId}/comments`)}
+              >
+                View Comments
+              </Button>
+              <DeletePostButton
+                userId={post.user_id}
+                postId={post.id}
+                title="Delete Post"
+                confirmTitle="Delete Post"
+                confirmMessage="Are you sure you want to delete this post? This action cannot be undone."
+              />
+            </div>
+          </div>
+
+          {/* Reactions placeholder on the right */}
+          <div className="level-right">
+            {/* Use ReactionBar component here, passing the postId as a prop */}
+            <ReactionBar postId={postId} />
+          </div>
+        </nav>
+
+        <hr />
+
+        {/* Full post content/body */}
+        <div className="content">{post.content}</div>
+      </Card>
+    </Container>
   );
 };
