@@ -1,5 +1,11 @@
 // Users
-export { getUserById, getAllUsers, updateUser, getActiveUsers, getInactiveUsers } from "./UserService.js";
+export {
+  getUserById,
+  getAllUsers,
+  updateUser,
+  getActiveUsers,
+  getInactiveUsers,
+} from "./UserService.js";
 
 // Posts
 export {
@@ -22,10 +28,18 @@ export {
 } from "./CategoryService.js";
 
 // Comments
-export { getCommentsByPostId, createComment } from "./CommentService.js";
+export {
+  getCommentsByPostId,
+  createComment,
+  deleteComment,
+} from "./CommentService.js";
 
 // Reactions
 export { getAllReactions } from "./ReactionService.js";
 
 // PostReactions
-export { getAllPostReactions, getPostReactionsByPostId, updateOrCreatePostReaction } from "./PostReactionService.js";
+export {
+  getAllPostReactions,
+  getPostReactionsByPostId,
+  updateOrCreatePostReaction,
+} from "./PostReactionService.js";
