@@ -33,5 +33,8 @@ export { getAllReactions } from "./ReactionService.js";
 // PostReactions
 export { getAllPostReactions, getPostReactionsByPostId, updateOrCreatePostReaction } from "./PostReactionService.js";
 
+//Tags
+export { getAllTags, createTag, getTagById, editTag } from "./TagService.js";
+
 // Images/Avatars
 export { getAvatars } from "./ImageService.js";
