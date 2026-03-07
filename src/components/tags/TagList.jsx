@@ -12,6 +12,7 @@ import {
   ConfirmDialog,
 } from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext";
+import { EditTagButton } from "./EditTagButton";
 
 export const TagList = () => {
   const { currentUser } = useCurrentUser();
@@ -22,7 +23,7 @@ export const TagList = () => {
   const [selectedTagId, setSelectedTagId] = useState(null);
   const dialogRef = useRef(null);
 
-  useEffect(() => {
+  const getAndSetTags = () => {
     getAllTags()
       .then((fetchedTags) => {
         setTags(fetchedTags);
@@ -33,6 +34,10 @@ export const TagList = () => {
         setTags([]);
         setLoading(false);
       });
+  };
+
+  useEffect(() => {
+    getAndSetTags();
   }, []);
 
   if (!currentUser || !currentUser.is_staff) {
@@ -82,10 +87,11 @@ export const TagList = () => {
             {/* Left: icon buttons */}
             <div className="media-left">
               <div className="buttons are-small">
-                <IconButton
+                <EditTagButton
                   icon="gear"
-                  title="Edit tag (coming soon)"
-                  onClick={() => {}}
+                  title="Edit tag"
+                  tagId={tag.id}
+                  onUpdate={getAndSetTags}
                 />
                 <IconButton
                   icon="trash"

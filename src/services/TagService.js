@@ -12,3 +12,14 @@ export const createTag = (tag) => {
 export const deleteTag = (id) => {
   return deleteJson(`/tags/${id}`);
 };
+
+export const getTagById = (id) => {
+  return fetchJson(`/tags/${id}`);
+};
+
+export const editTag = (id, updatedTag) => {
+  return fetchJson(`/tags/${id}`, {
+    method: "PUT",
+    body: JSON.stringify(updatedTag),
+  });
+};

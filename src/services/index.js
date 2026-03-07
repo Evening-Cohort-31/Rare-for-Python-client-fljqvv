@@ -41,4 +41,10 @@ export {
 } from "./PostReactionService.js";
 
 // Tags
-export { getAllTags, createTag, deleteTag } from "./TagService.js";
+export {
+  getAllTags,
+  createTag,
+  deleteTag,
+  getTagById,
+  editTag,
+} from "./TagService.js";
