@@ -1,7 +1,8 @@
-import { Button, Card, Container } from "../../design"
+import { Card, Container } from "../../design"
 import { Link, useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
 import { getUserById } from "../../services"
+import { SubscribeButton } from "./SubscribeButton"
 
 export const UserDetails = () => {
 
@@ -34,7 +35,12 @@ export const UserDetails = () => {
                         <Link to={`/users/${author.id}/posts`} className="has-text-link">View Posts (Coming Soon Ticket #35)</Link>
                     </div>
                     <div className="column is-3 has-text-right">
-                        <Button variant="primary" className="mb-4" title="Subscribe to this author(coming soon Ticket #31)">Subscribe</Button>
+                        <SubscribeButton 
+                        variant="primary" 
+                        className="mb-4"
+                        authorId = {author.id}
+                        formatDate = {formatDate}
+                        title="Subscribe to this author"/> 
                     </div>
                 </div>
             </Card>
