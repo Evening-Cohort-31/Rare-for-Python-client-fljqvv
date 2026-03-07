@@ -1,5 +1,11 @@
 // Users
-export { getUserById, getAllUsers, updateUser, getActiveUsers, getInactiveUsers } from "./UserService.js";
+export {
+  getUserById,
+  getAllUsers,
+  updateUser,
+  getActiveUsers,
+  getInactiveUsers,
+} from "./UserService.js";
 
 // Posts
 export {
@@ -16,8 +22,8 @@ export {
 
 // Categories
 export {
-  getAllCategories,
-  createCategory,
+  getAllCategories, getCategoryById,
+  createCategory, updateCategory,
   deleteCategory, // Added for Ticket #16 - Delete a Category
 } from "./CategoryService.js";
 
@@ -28,7 +34,17 @@ export { getCommentsByPostId, createComment } from "./CommentService.js";
 export { getAllReactions } from "./ReactionService.js";
 
 // PostReactions
-export { getAllPostReactions, getPostReactionsByPostId, updateOrCreatePostReaction } from "./PostReactionService.js";
+export {
+  getAllPostReactions,
+  getPostReactionsByPostId,
+  updateOrCreatePostReaction,
+} from "./PostReactionService.js";
 
-//Tags
-export { getAllTags, createTag, getTagById, editTag } from "./TagService.js";
+// Tags
+export {
+  getAllTags,
+  createTag,
+  deleteTag,
+  getTagById,
+  editTag,
+} from "./TagService.js";
