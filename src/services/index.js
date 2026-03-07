@@ -22,8 +22,8 @@ export {
 
 // Categories
 export {
-  getAllCategories,
-  createCategory,
+  getAllCategories, getCategoryById,
+  createCategory, updateCategory,
   deleteCategory, // Added for Ticket #16 - Delete a Category
 } from "./CategoryService.js";
 
