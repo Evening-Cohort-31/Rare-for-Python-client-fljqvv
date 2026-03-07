@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import { useNavigate} from "react-router-dom";
-import { getAllTags } from "../../services/TagService";
+import { getAllTags } from "../../services";
 import { Button, Container, Loading, PageHeader, IconButton, Card} from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext";
+import { EditTagButton } from "./EditTagButton";
 
 export const TagList = () => {
     const { currentUser } = useCurrentUser();
@@ -11,15 +12,19 @@ export const TagList = () => {
     const [tags, setTags] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
+    const getAndSetTags = () => {
         getAllTags().then(fetchedTags => {
             setTags(fetchedTags);
             setLoading(false);
-        }).catch(error => {
+        }       ).catch(error => {
             console.error("Failed to fetch tags:", error);
             setTags([]);
             setLoading(false);
         });
+    };  
+
+    useEffect(() => {
+        getAndSetTags();
     }, []);
 
     if (!currentUser || !currentUser.is_staff) {
@@ -45,14 +50,15 @@ export const TagList = () => {
                                    {/* Left: icon buttons */}
                                    <div className="media-left">
                                      <div className="buttons are-small">
-                                       <IconButton
-                                         icon="gear"
-                                         title="Edit category (coming soon)"
-                                         onClick={() => {}}
-                                       />
+                                       <EditTagButton
+                                          icon="gear"
+                                          title="Edit tag"
+                                          tagId={tag.id}
+                                          onUpdate={getAndSetTags}
+                                          />
                                        <IconButton
                                          icon="trash"
-                                         title="Delete category (coming soon)"
+                                         title="Delete tag"
                                          onClick={() => {}}
                                        />
                                      </div>
@@ -63,7 +69,6 @@ export const TagList = () => {
                                      <div className="content">
                                        <p className="mb-0">
                                          <span className="has-text-weight-semibold">{tag.label}</span>
-                                         <hr className="my-2" />
                                        </p>
                                      </div>
                                    </div>
