@@ -32,7 +32,10 @@ export const CategoriesList = () => {
       <h2>Categories</h2>
       <ul>
         {categories.map(category => (
-          <li key={category.id}>{category.label}</li>
+          <li key={category.id}>
+            {category.label}
+            <button onClick={() => navigate(`/categories/edit/${category.id}`)}>Edit</button>
+          </li>
         ))}
       </ul>
         <p>Add more categories by clicking the button below.</p>
