@@ -65,19 +65,6 @@ export const CategoriesList = () => {
   };
 
   return (
-    <div>
-      <h2>Categories</h2>
-      <ul>
-        {categories.map(category => (
-          <li key={category.id}>
-            {category.label}
-            <button onClick={() => navigate(`/categories/edit/${category.id}`)}>Edit</button>
-          </li>
-        ))}
-      </ul>
-        <p>Add more categories by clicking the button below.</p>
-        <button onClick={() => navigate("/categories/new")}>Create a Category</button>
-    </div>
     <Container>
       <PageHeader title="Categories" centered />
 
@@ -102,7 +89,7 @@ export const CategoriesList = () => {
                 <IconButton
                   icon="gear"
                   title="Edit category (coming soon)"
-                  onClick={() => {}}
+                  onClick={() => navigate(`/categories/edit/${category.id}`)}
                 />
                 <IconButton
                   icon="trash"
