@@ -16,3 +16,14 @@ export const uploadFile = async (endpoint, formData) => {
 
     return response.json()
 }
+
+export const uploadProfileImage = async (userId, file) => {
+    const formData = new FormData()
+    formData.append("user_id", userId)
+    formData.append("image", file)
+    return uploadFile("/profile-images", formData)
+}
+
+export function getPreviouslyUploadedImages(userId) {
+    return fetchJson(`/profile-images?user_id=${userId}`);
+}

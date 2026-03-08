@@ -13,6 +13,10 @@ export const ProfilePhotoModal = ({
   currentImgSrc,
   onLoadAvatars,
   onPickURL,
+  selectedFile,
+  onFileChange,
+  onUpload,
+  userId,
 }) => (
   <dialog
     ref={dialogRef}
@@ -48,8 +52,15 @@ export const ProfilePhotoModal = ({
 
           <hr />
 
-          {/* UploadSection component allows the user to upload a new profile photo from their device. */}
-          <UploadSection />
+          {/* UploadSection component allows the user to upload a new profile photo from their device or select from previous uploads. */}
+          <UploadSection
+            selectedFile={selectedFile}
+            onFileChange={onFileChange}
+            onUpload={onUpload}
+            isSaving={isSaving}
+            userId={userId}
+            onPickURL={onPickURL}
+          />
 
           <hr />
 

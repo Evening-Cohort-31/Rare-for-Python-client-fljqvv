@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from "react"
 import { useCurrentUser } from "../../context/CurrentUserContext"
-import { updateUser, getAvatars } from "../../services/index.js"
+import { updateUser, getAvatars, uploadProfileImage } from "../../services/index.js"
 import { buildImageSrc } from "../utils/imageUtils.js"
 import { ProfilePhotoModal } from "./ProfilePhotoModal.jsx"
 
@@ -22,6 +22,9 @@ export const ProfileImage = ({ user }) => {
   const [isSaving, setIsSaving] = useState(false)
   const [error, setError] = useState(null)
 
+  // State to manage the selected file for uploading a new profile image.
+  const [selectedFile, setSelectedFile] = useState(null)
+
   // The useMemo hook is used to compute the current image source for the profile picture. 
   // It memoizes the value based on the displayUser's profile_image_url, ensuring that the image source is only recalculated when the displayUser changes.
   // It optimizes performance over useEffect by avoiding unnecessary computations on every render.
@@ -41,6 +44,31 @@ export const ProfileImage = ({ user }) => {
     const dialogEl = dialogRef.current
     if (!dialogEl) return
     if (dialogEl.open) dialogEl.close()
+  }
+
+  // Handler for when the user selects a file to upload as their new profile image.
+  const handleFileChange = (e) => {
+    setSelectedFile(e.target.files?.[0] ?? null)
+  }
+
+  // Function to handle uploading a new profile image file.
+  const handleUpload = async () => {
+    if (!selectedFile || !currentUser) return
+
+    setIsSaving(true)
+    setError(null)
+
+    try {
+      await uploadProfileImage(currentUser.id, selectedFile)
+      setSelectedFile(null)
+      closeDialog()
+      await fetchUserData()
+    } catch (e) {
+      console.error(e)
+      setError("Could not upload image.")
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   // Function to load available avatars from the server. It manages loading state and error handling while fetching the avatar list.
@@ -167,6 +195,10 @@ export const ProfileImage = ({ user }) => {
           currentImgSrc={currentImgSrc}
           onLoadAvatars={loadAvatars}
           onPickURL={handleUserImageURLChange}
+          selectedFile={selectedFile}
+          onFileChange={handleFileChange}
+          onUpload={handleUpload}
+          userId={currentUser.id}
         />
       )}
     </section>

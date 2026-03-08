@@ -53,4 +53,4 @@ export {
 } from "./TagService.js";
 
 // Images/Avatars
-export { getAvatars, uploadFile } from "./ImageService.js";
+export { getAvatars, uploadFile, uploadProfileImage, getPreviouslyUploadedImages } from "./ImageService.js";
