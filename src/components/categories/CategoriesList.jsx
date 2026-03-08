@@ -86,7 +86,7 @@ export const CategoriesList = () => {
                 <IconButton
                   icon="gear"
                   title="Edit category (coming soon)"
-                  onClick={() => {}}
+                  onClick={() => navigate(`/categories/edit/${category.id}`)}
                 />
                 <IconButton
                   icon="trash"
