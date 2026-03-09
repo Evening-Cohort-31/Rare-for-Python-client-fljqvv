@@ -22,13 +22,19 @@ export {
 
 // Categories
 export {
-  getAllCategories, getCategoryById,
-  createCategory, updateCategory,
+  getAllCategories,
+  getCategoryById,
+  createCategory,
+  updateCategory,
   deleteCategory, // Added for Ticket #16 - Delete a Category
 } from "./CategoryService.js";
 
 // Comments
-export { getCommentsByPostId, createComment } from "./CommentService.js";
+export {
+  getCommentsByPostId,
+  createComment,
+  deleteComment,
+} from "./CommentService.js";
 
 // Reactions
 export { getAllReactions } from "./ReactionService.js";
