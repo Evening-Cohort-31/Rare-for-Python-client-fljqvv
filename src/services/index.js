@@ -23,7 +23,9 @@ export {
 // Categories
 export {
   getAllCategories,
+  getCategoryById,
   createCategory,
+  updateCategory,
   deleteCategory, // Added for Ticket #16 - Delete a Category
 } from "./CategoryService.js";
 
@@ -43,3 +45,12 @@ export {
   getPostReactionsByPostId,
   updateOrCreatePostReaction,
 } from "./PostReactionService.js";
+
+// Tags
+export {
+  getAllTags,
+  createTag,
+  deleteTag,
+  getTagById,
+  editTag,
+} from "./TagService.js";
