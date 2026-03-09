@@ -1,4 +1,4 @@
-import { fetchJson, postJson, putJson } from "./apiSettings";
+import { fetchJson, postJson, putJson, deleteJson } from "./apiSettings";
 
 // expand supports: "user", "author", and "post"
 // "author" is an alias for "user"
@@ -18,10 +18,9 @@ export function getCommentsByPostId(postId, ...expand) {
   normalized.forEach((e) => {
     params.append("_expand", e);
   });
-  
+
   return fetchJson(`/comments?${params.toString()}`);
 }
-
 
 export function createComment(comment) {
   return postJson("/comments", comment);
@@ -34,3 +33,8 @@ export function editComment(commentId, commentData) {
 export function getCommentById(id) {
   return fetchJson(`/comments/${id}?_expand=user`);
 }
+
+// Ticket #22 - Delete a Comment: sends DELETE request to remove a comment by id
+export const deleteComment = (id) => {
+  return deleteJson(`/comments/${id}`);
+};

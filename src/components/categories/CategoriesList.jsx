@@ -90,7 +90,7 @@ export const CategoriesList = () => {
                 />
                 <IconButton
                   icon="trash"
-                  title="Delete category (coming soon)"
+                  title="Delete category"
                   onClick={() => {
                     setSelectedCategoryId(category.id);
                     dialogRef.current?.showModal();
