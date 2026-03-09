@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { getAllPosts } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 // CHANGED: Added Link alongside useNavigate (Added on view_post_details_5)
-import { Loading, PageHeader, Card, Container } from "../../design";
-import { ReactionBar } from "../reactions/ReactionBar.jsx";
+import { Loading, PageHeader, Container, Button} from "../../design";
+import { PostCard } from "./PostCard.jsx";
 
 export const AllPosts = () => {
   const { currentUser } = useCurrentUser();
@@ -26,33 +26,15 @@ export const AllPosts = () => {
   return (
     <Container>
       <PageHeader title="All Posts" centered />
-      <button className="button is-link mb-5" onClick={() => navigate("/posts/new")}>New Post</button>
+      <Button className="is-link mb-5" onClick={() => navigate("/posts/new")}>New Post</Button>
       <div className="columns is-multiline">
         {posts.map((post) => (
           <div className="column is-half" key={post.id}>
-            {/* CHANGED: Wrapped title in Link for clickable navigation to post details (Added on view_post_details_5) */}
-            <Card title={<Link to={`/posts/${post.id}`}>{post.title}</Link>}>
-              <p>
-                <strong>Author:</strong> {post.author}
-              </p>
-              <p>
-                <strong>Category:</strong> {post.category?.label || "None"}
-              </p>
-              <p>
-                <strong>Date:</strong> {post.publication_date}
-              </p>
-              <div className="buttons">
-                  {currentUser && currentUser.id === post.user_id && (
-                    <button className ="button" onClick={() => navigate(`/my-posts/edit/${post.id}`)}>
-                  Edit Post
-                </button>
-                    )}
-             </div>
-             <hr />
-                <div className="mt-3">
-                  <ReactionBar postId={post.id} />
-                </div>
-          </Card>
+            <PostCard 
+            post={post} 
+            currentUser={currentUser} 
+            showEdit={true} 
+            showReactions={true} />
           </div>
         ))}
       
