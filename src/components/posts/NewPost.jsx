@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { createPost, getAllCategories } from "../../services"
+import { createPost, getAllCategories, getAllTags } from "../../services"
 import { Container, PageHeader } from "../../design"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
 import { PostForm } from "./PostForm"
@@ -19,10 +19,12 @@ export const NewPost = () => {
   })
 
   const [categories, setCategories] = useState([])
+  const [tags, setTags] = useState([])
   const [submitError, setSubmitError] = useState("")
 
   useEffect(() => {
     getAllCategories().then(setCategories)
+    getAllTags().then(setTags)
   }, [])
 
   useEffect(() => {
@@ -33,12 +35,6 @@ export const NewPost = () => {
       }))
     }
   }, [currentUser])
-
-  const tags = [
-    { id: 1, label: "JavaScript" },
-    { id: 2, label: "Python" },
-    { id: 3, label: "React" },
-  ]
 
   const handleInputChange = (e) => {
     const { name, value } = e.target

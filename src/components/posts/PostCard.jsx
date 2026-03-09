@@ -1,3 +1,4 @@
+// Reusable card component for displaying post summaries, with optional edit button and reaction bar.
 import { useNavigate, Link } from "react-router-dom"
 import { Card, Button } from "../../design"
 import { ReactionBar } from "../reactions/ReactionBar"

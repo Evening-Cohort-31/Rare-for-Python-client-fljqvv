@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { updatePost, getAllCategories, getPostById } from "../../services"
+import { updatePost, getAllCategories, getPostById, getAllTags} from "../../services"
 import { useCurrentUser } from "../../context/CurrentUserContext.js"
 import { useParams, useNavigate } from "react-router-dom"
 import { Container, PageHeader, Loading } from "../../design"
@@ -10,6 +10,7 @@ export const EditPost = () => {
   const { currentUser } = useCurrentUser()
   const [post, setPost] = useState(null)
   const [categories, setCategories] = useState([])
+  const [tags, setTags] = useState([])
   const [loading, setLoading] = useState(true)
   const [submitError, setSubmitError] = useState("")
   const navigate = useNavigate()
@@ -17,8 +18,8 @@ export const EditPost = () => {
   useEffect(() => {
     if (!currentUser) return
 
-    Promise.all([getPostById(postId), getAllCategories()])
-      .then(([fetchedData, fetchedCategories]) => {
+    Promise.all([getPostById(postId), getAllCategories(), getAllTags()])
+      .then(([fetchedData, fetchedCategories, fetchedTags]) => {
         const fetchedPost = Array.isArray(fetchedData)
           ? fetchedData.find((p) => p.id === parseInt(postId))
           : fetchedData
@@ -29,6 +30,7 @@ export const EditPost = () => {
         }
 
         setPost(fetchedPost)
+        setTags(fetchedTags)
         setCategories(fetchedCategories)
         setLoading(false)
       })
@@ -107,7 +109,8 @@ export const EditPost = () => {
             submitError={submitError}
             submitLabel="Save Changes"
             showImageUrl={false}
-            showTags={false}
+            showTags={true}
+            tags={tags}
           />
         </div>
       </div>

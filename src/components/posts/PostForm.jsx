@@ -1,3 +1,4 @@
+// Reusable form component for creating and editing posts, with support for categories, tags, and image URLs.
 import {
   Form,
   FormField,
@@ -23,7 +24,7 @@ export const PostForm = ({
   onTagChange,
 }) => {
   return (
-    <Card className="edit-post-card">
+    <Card className="edit-form-card">
       <Form onSubmit={onSubmit}>
         <FormField label="Title">
           <input
