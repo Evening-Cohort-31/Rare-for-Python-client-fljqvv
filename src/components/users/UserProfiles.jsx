@@ -1,42 +1,37 @@
 // Component for displaying all user profiles.
 import { useEffect, useState, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
-import {
-  getAllUsers,
-  getInactiveUsers,
-  getActiveUsers,
-  updateUser,
-} from "../../services/index.js";
+import { useNavigate } from "react-router-dom";
+import { getAllUsers, updateUser } from "../../services/index.js";
 import {
   Loading,
   PageHeader,
   Container,
-  Card,
   ConfirmDialog,
-  Button,
-  Tag,
+  Notification,
 } from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
+import { UserFilterButtons } from "./UserFilterButtons.jsx";
+import { UserTable } from "./UserTable.jsx";
+import { ChangeUserTypeModal } from "./ChangeUserTypeModal.jsx";
 import "./UserProfiles.css";
 
 export const UserProfiles = () => {
-  const [users, setUsers] = useState([])
-  const [activeFilter, setActiveFilter] = useState("all")
-  const [notification, setNotification] = useState("")
-  const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [notification, setNotification] = useState("");
+  const roleDialogRef = useRef();
+  const [selectedRoleUser, setSelectedRoleUser] = useState(null);
+  const [selectedUserType, setSelectedUserType] = useState("");
+  const [roleSubmitError, setRoleSubmitError] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // State to trigger re-fetching users after toggling active status
-  // This refreshKey state is used to trigger the useEffect hook to re-fetch the user list whenever a user's active status is toggled.
-  // By incrementing this key, we can ensure that the latest user data is loaded without having to directly manipulate the users state after an update.
+  // Incrementing this triggers the useEffect to re-fetch users after an update.
   const [refreshKey, setRefreshKey] = useState(0);
 
   const navigate = useNavigate();
-
   const { currentUser } = useCurrentUser();
-  // Ref for the confirmation dialog
-  // useRef hook is used to get a reference to the ConfirmDialog component, allowing us to programmatically control its visibility and content when toggling user active status.
   const dialogRef = useRef();
-
   const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
@@ -45,17 +40,23 @@ export const UserProfiles = () => {
     const loadUsers = async () => {
       setLoading(true);
       try {
+        const allUsersData = await getAllUsers();
         let usersData;
+
+        setAllUsers(
+          allUsersData.map((u) => ({ ...u, active: Boolean(u.active) })),
+        );
+
         if (activeFilter === "active") {
-          usersData = await getActiveUsers();
+          usersData = allUsersData.filter((u) => u.active);
         } else if (activeFilter === "inactive") {
-          usersData = await getInactiveUsers();
+          usersData = allUsersData.filter((u) => !u.active);
         } else if (activeFilter === "authors") {
-          usersData = (await getAllUsers()).filter((u) => !u.is_staff);
+          usersData = allUsersData.filter((u) => !u.is_staff);
         } else if (activeFilter === "admins") {
-          usersData = (await getAllUsers()).filter((u) => u.is_staff);
+          usersData = allUsersData.filter((u) => u.is_staff);
         } else {
-          usersData = await getAllUsers();
+          usersData = allUsersData;
         }
 
         if (isMounted) {
@@ -75,49 +76,98 @@ export const UserProfiles = () => {
     };
   }, [activeFilter, refreshKey]);
 
-  // Handler for toggling user active status - opens confirmation dialog
   const handleToggleActive = (user) => {
     setSelectedUser(user);
     dialogRef.current.showModal();
   };
 
-  // Handler for confirming active status toggle - updates user and refreshes list by incrementing refreshKey
   const handleConfirmToggle = async () => {
-  if (!selectedUser) return
+    if (!selectedUser) return;
 
-  const newActiveStatus = !selectedUser.active
+    try {
+      await updateUser(selectedUser.id, {
+        ...selectedUser,
+        active: !selectedUser.active,
+      });
+      setSelectedUser(null);
+      setRefreshKey((prev) => prev + 1);
+    } catch (error) {
+      console.error("Failed to update user:", error);
+    }
+  };
 
-  try {
-    await updateUser(selectedUser.id, { ...selectedUser, active: newActiveStatus })
-    setSelectedUser(null)
-    setRefreshKey((prev) => prev + 1)
-  } catch (error) {
-    console.error("Failed to update user:", error)
-  }
-}
-
-  // Handler for canceling active status toggle - simply closes the confirmation dialog without making changes
   const handleCancelToggle = () => {
     setSelectedUser(null);
   };
 
-  // Handler for navigating to UserTypeForm - navigates to the user role change form for the selected user
+  const handleCancelRoleChange = () => {
+    setSelectedRoleUser(null);
+    setSelectedUserType("");
+    setRoleSubmitError("");
+  };
+
   const handleChangeRole = (user) => {
-  const adminCount = users.filter((u) => u.is_staff).length
+    setNotification("");
+    setRoleSubmitError("");
 
-  // Prevent demoting the last remaining admin
-  if (user.is_staff && adminCount === 1) {
-    setNotification(
-      "This is the last Admin. Please promote another user to Admin before demoting this user."
-    )
-    return
-  }
+    const adminCount = allUsers.filter((u) => u.is_staff).length;
 
-  navigate(`/users/${user.id}/change-type`)
-}
+    if (user.id === currentUser.id) {
+      setNotification("You cannot change your own user type.");
+      return;
+    }
+
+    if (user.is_staff && adminCount === 1) {
+      setNotification(
+        "This is the last Admin. Please promote another user to Admin before demoting this user.",
+      );
+      return;
+    }
+
+    setSelectedRoleUser(user);
+    setSelectedUserType(user.is_staff ? "admin" : "author");
+    roleDialogRef.current?.showModal();
+  };
+
+  const handleConfirmRoleChange = async () => {
+    if (!selectedRoleUser) return;
+
+    setRoleSubmitError("");
+
+    const adminCount = allUsers.filter((u) => u.is_staff).length;
+
+    if (selectedRoleUser.id === currentUser.id) {
+      setRoleSubmitError("You cannot change your own user type.");
+      return;
+    }
+
+    if (selectedRoleUser.is_staff && selectedUserType === "author" && adminCount === 1) {
+      setRoleSubmitError(
+        "This is the last Admin. Please promote another user to Admin before demoting this user.",
+      );
+      return;
+    }
+
+    try {
+      await updateUser(selectedRoleUser.id, {
+        ...selectedRoleUser,
+        is_staff: selectedUserType === "admin",
+      });
+
+      setSelectedRoleUser(null);
+      setSelectedUserType("");
+      setRefreshKey((prev) => prev + 1);
+
+      if (roleDialogRef.current?.open) {
+        roleDialogRef.current.close();
+      }
+    } catch (error) {
+      console.error("Failed to update user role:", error);
+      setRoleSubmitError("Failed to update user role. Please try again.");
+    }
+  };
 
   // Access control: only staff users can view this page
-  // Redirects non-staff users to an access denied page.
   if (!currentUser || !currentUser.is_staff) {
     navigate("/access-denied", { replace: true });
     return null;
@@ -131,147 +181,27 @@ export const UserProfiles = () => {
     <Container>
       <PageHeader title="Users" centered />
 
-      {/* Top Filter buttons */}
-      <div className="level-item">
-        <div className="buttons">
-          <Button
-            color="info"
-            variant={activeFilter === "all" ? "outlined" : undefined}
-            onClick={() => setActiveFilter("all")}
-          >
-            All Users
-          </Button>
-          <Button
-            color="info"
-            variant={activeFilter === "active" ? "outlined" : undefined}
-            onClick={() => setActiveFilter("active")}
-          >
-            Active Users
-          </Button>
-          <Button
-            color="info"
-            variant={activeFilter === "inactive" ? "outlined" : undefined}
-            onClick={() => setActiveFilter("inactive")}
-          >
-            Inactive Users
-          </Button>
-          <Button
-            color="info"
-            variant={activeFilter === "authors" ? "outlined" : undefined}
-            onClick={() => setActiveFilter("authors")}
-          >
-            Authors
-          </Button>
-          <Button
-            color="info"
-            variant={activeFilter === "admins" ? "outlined" : undefined}
-            onClick={() => setActiveFilter("admins")}
-          >
-            Admins
-          </Button>
+      {notification ? (
+        <div className="mb-4">
+          <Notification
+            type="warning"
+            message={notification}
+            onClose={() => setNotification("")}
+          />
         </div>
-      </div>
+      ) : null}
 
-      {/* Table */}
-      <Card className="user-profiles-card">
-        <div className="table-container">
-          <table className="table is-striped is-hoverable">
-            <thead>
-              <tr>
-                <th>Username</th>
-                <th>Name</th>
-                <th>Active Status</th>
-                <th>Author or Admin</th>
-              </tr>
-            </thead>
+      <UserFilterButtons
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
 
-            <tbody>
-              {users.map((user) => (
-                <tr key={user.id}>
-                  {/* Username */}
-                  <td>
-                    <Link to={`/users/${user.id}`}>{user.username}</Link>
-                  </td>
-
-                  {/* User Name */}
-                  <td>
-                    {user.first_name} {user.last_name}
-                  </td>
-
-                  {/* Active Status: checkbox + action button */}
-                  <td>
-                    <div
-                      className="is-flex is-align-items-center"
-                      style={{ gap: "0.75rem" }}
-                    >
-                      <label className="checkbox">
-                        <input
-                          type="checkbox"
-                          checked={!!user.active}
-                          onChange={(e) => {
-                            // prevent the checkbox from visually toggling before confirmation
-                            e.preventDefault();
-                            handleToggleActive(user);
-                          }}
-                        />
-                        <span style={{ marginLeft: "0.5rem" }}>
-                          {user.active ? "Active" : "Inactive"}
-                        </span>
-                      </label>
-
-                      {/* Action button to toggle active status - shows "Deactivate" for active users and "Activate" for inactive users */}
-                      {user.active ? (
-                        <Button
-                          color="danger"
-                          size="small"
-                          onClick={() => handleToggleActive(user)}
-                        >
-                          Deactivate
-                        </Button>
-                      ) : (
-                        <Button
-                          color="success"
-                          size="small"
-                          onClick={() => handleToggleActive(user)}
-                        >
-                          Activate
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-
-                  {/* Role */}
-                  <td>
-                    <div
-                      className="is-flex is-align-items-center is-flex-wrap-wrap"
-                      style={{ gap: "0.75rem" }}
-                    >
-                      <Tag
-                        className="user-role-tag"
-                        color={user.is_staff ? "warning" : "info"}
-                        light
-                        rounded
-                      >
-                        {user.is_staff ? "👑 Admin" : "✍️ Author"}
-                      </Tag>
-
-                      {user.id !== currentUser.id && (
-                        <Button
-                          color="warning"
-                          size="small"
-                          onClick={() => handleChangeRole(user)}
-                        >
-                          {user.is_staff ? "Demote to Author" : "Promote to Admin"}
-                        </Button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+      <UserTable
+        users={users}
+        currentUser={currentUser}
+        onToggleActive={handleToggleActive}
+        onChangeRole={handleChangeRole}
+      />
 
       <ConfirmDialog
         dialogRef={dialogRef}
@@ -285,6 +215,17 @@ export const UserProfiles = () => {
         confirmColor={selectedUser?.active ? "is-danger" : "is-success"}
         onConfirm={handleConfirmToggle}
         onCancel={handleCancelToggle}
+      />
+
+      <ChangeUserTypeModal
+        dialogRef={roleDialogRef}
+        selectedRoleUser={selectedRoleUser}
+        selectedUserType={selectedUserType}
+        onUserTypeChange={setSelectedUserType}
+        onConfirm={handleConfirmRoleChange}
+        onCancel={handleCancelRoleChange}
+        roleSubmitError={roleSubmitError}
+        onClearError={() => setRoleSubmitError("")}
       />
     </Container>
   );
