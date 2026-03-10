@@ -15,7 +15,7 @@ export const fetchJson = async (endpoint, options = {}) => {
 export const postJson = async (endpoint, data) => {
     const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json",},
+        headers: { "Content-Type": "application/json", },
         body: JSON.stringify(data)
     });
 
@@ -49,7 +49,7 @@ export const deleteJson = async (endpoint) => {
         throw new Error(`DELETE failed: ${response.status} ${response.statusText}`);
     }
 
-    if (response.status === 204 ) {
+    if (response.status === 204) {
         return null;
     }
 

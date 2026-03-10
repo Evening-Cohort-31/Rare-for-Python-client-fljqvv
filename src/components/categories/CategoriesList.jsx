@@ -53,15 +53,12 @@ export const CategoriesList = () => {
 
   // Ticket #16 - handles confirmed deletion: calls the API, then filters the deleted category out of state so the UI updates instantly without a page refresh
   const handleConfirmDelete = () => {
-    deleteCategory(selectedCategoryId).then((response) => {
-      // Filter out the deleted category from local state so the list updates immediately
-      const updatedCategories = categories.filter(
-        (category) => category.id !== selectedCategoryId,
-      );
-      setCategories(updatedCategories);
+    const idToDelete = selectedCategoryId;
+    deleteCategory(idToDelete).then(() => {
+      setCategories((prev) => prev.filter((category) => category.id !== idToDelete));
+      dialogRef.current?.close();
+      setSelectedCategoryId(null);
     });
-    dialogRef.current?.close(); //This is setup to close the modal and not navigate to another page.
-    setSelectedCategoryId(null); //Good safeguard to help prevent bugs.
   };
 
   return (
@@ -109,8 +106,8 @@ export const CategoriesList = () => {
                   <span className="has-text-weight-semibold">
                     {category.label}
                   </span>
-                  <hr className="my-2" />
                 </p>
+                <hr className="my-2" />
               </div>
             </div>
 

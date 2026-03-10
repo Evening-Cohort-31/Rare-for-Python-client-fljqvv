@@ -47,7 +47,13 @@ export const SubscribeButton = ({variant, className, title, authorId }) => {
         
     }
 
-    return(
+    if (!currentUser || currentUser.id === authorId) {
+        return null; // Don't show the button if the user is not logged in or is viewing their own profile
+    }
+
+    else {
+
+        return(
 
         // The button's text and onClick function are determined by the current state of "isSubscribed". If "isSubscribed" is true, the button will display "Unsubscribe" and clicking it will trigger the unsubscribeToAuthor function. If "isSubscribed" is false, the button will display "Subscribe" and clicking it will trigger the subscribeToAuthor function.
 
@@ -60,7 +66,7 @@ export const SubscribeButton = ({variant, className, title, authorId }) => {
         </Button>
         </>
 
-    )
+    )}
    
 
 }
