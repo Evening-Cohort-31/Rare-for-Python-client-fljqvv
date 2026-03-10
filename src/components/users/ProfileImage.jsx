@@ -71,12 +71,16 @@ export const ProfileImage = ({ user }) => {
     }
   }
 
-  // Function to load available avatars from the server. It manages loading state and error handling while fetching the avatar list.
+  // Fetches the avatars and sets a timeout to handle cases where the request takes too long, ensuring the user receives feedback if the avatars cannot be loaded in a reasonable time frame.
+  // Avatars come from site https://multiavatar.com/
   const loadAvatars = async () => {
     setIsLoadingAvatars(true)
     setError(null)
     try {
-      const data = await getAvatars()
+      const timeout = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Request timed out")), 8000)
+      )
+      const data = await Promise.race([getAvatars(), timeout])
       const list = Array.isArray(data) ? data : data?.avatars
       setAvatars(list ?? [])
     } catch (e) {

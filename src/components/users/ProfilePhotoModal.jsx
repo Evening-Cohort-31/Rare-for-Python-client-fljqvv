@@ -1,6 +1,6 @@
 import { AvatarGrid } from "./AvatarGrid.jsx"
-import { UploadSection } from "./UploadSection.jsx"
-import { UrlSection } from "./UrlSection.jsx"
+// import { UploadSection } from "./UploadSection.jsx"
+// import { UrlSection } from "./UrlSection.jsx"
 
 // Modal component for changing the user's profile photo. 
 // It includes sections for selecting from available avatars, uploading a new photo, or providing a URL.
@@ -13,10 +13,10 @@ export const ProfilePhotoModal = ({
   currentImgSrc,
   onLoadAvatars,
   onPickURL,
-  selectedFile,
-  onFileChange,
-  onUpload,
-  userId,
+  // selectedFile,
+  // onFileChange,
+  // onUpload,
+  // userId,
 }) => (
   <dialog
     ref={dialogRef}
@@ -50,25 +50,25 @@ export const ProfilePhotoModal = ({
             onPickURL={onPickURL} // Function to handle the selection of an avatar or entering a URL updating the user's profile photo
           />
 
-          <hr />
+          {/* <hr /> */}
 
           {/* UploadSection component allows the user to upload a new profile photo from their device or select from previous uploads. */}
-          <UploadSection
+          {/* <UploadSection
             selectedFile={selectedFile}
             onFileChange={onFileChange}
             onUpload={onUpload}
             isSaving={isSaving}
             userId={userId}
             onPickURL={onPickURL}
-          />
+          /> */}
 
-          <hr />
+          {/* <hr /> */}
 
           {/* UrlSection component allows the user to provide a URL for their new profile photo. */}
-          <UrlSection
+          {/* <UrlSection
             isSaving={isSaving}
             onPickURL={onPickURL}
-          />
+          /> */}
         </section>
 
         <footer className="modal-card-foot">
