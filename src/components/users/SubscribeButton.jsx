@@ -53,16 +53,21 @@ export const SubscribeButton = ({variant, className, title, authorId }) => {
 
     else {
 
+        const buttonColor = isSubscribed ? "success" : "primary"; // blue-ish teal primary color
+        const buttonText = isSubscribed ? "Subscribed ✓" : "Subscribe"; // green "Subscribe" color
+
         return(
 
         // The button's text and onClick function are determined by the current state of "isSubscribed". If "isSubscribed" is true, the button will display "Unsubscribe" and clicking it will trigger the unsubscribeToAuthor function. If "isSubscribed" is false, the button will display "Subscribe" and clicking it will trigger the subscribeToAuthor function.
 
         <>
-        <Button variant={variant}
-                className={className}
-                title={title}
-                onClick={handleClick}>
-                {isSubscribed ? "Unsubscribe" : "Subscribe"}
+        <Button 
+            color = {buttonColor}
+            variant={variant}
+            className={className}
+            title={title}
+            onClick={handleClick}>
+            {buttonText}
         </Button>
         </>
 
