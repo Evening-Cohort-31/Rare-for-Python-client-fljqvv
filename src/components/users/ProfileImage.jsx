@@ -172,7 +172,7 @@ export const ProfileImage = ({ user }) => {
           )}
         </figure>
 
-        {/* Button to change or upload a new profile photo, only shown if the user is viewing their own profile. It is disabled while saving to prevent multiple submissions. */}
+        {/* Button to change the user's avatar, only shown if the user is viewing their own profile. It is disabled while saving to prevent multiple submissions. */}
         {isOwnProfile && (
           <button
             type="button"
@@ -180,11 +180,11 @@ export const ProfileImage = ({ user }) => {
             onClick={handleOpen}
             disabled={isSaving}
           >
-            Change or Upload Photo
+            Change Avatar
           </button>
         )}
 
-        {/* Display any error messages related to loading avatars or updating the profile image */}
+        {/* Display any error messages related to loading avatars or updating the avatar */}
         {error ? <p className="has-text-danger mt-2">{error}</p> : null}
       </div>
 
