@@ -20,6 +20,7 @@ import { UserProfiles } from "../components/users/UserProfiles.jsx";
 import { TagList } from "../components/tags/TagList.jsx";
 import { NewTag } from "../components/tags/NewTag.jsx";
 import { UserDetails } from "../components/users/UserDetails.jsx";
+import { UserTypeForm } from "../components/users/UserTypeForm.jsx";
 
 export const ApplicationViews = ({ token, setToken }) => {
   return (
@@ -51,6 +52,7 @@ export const ApplicationViews = ({ token, setToken }) => {
           {/* Staff-only routes */}
           <Route element={<StaffOnly />}>
             <Route path="/users" element={<UserProfiles />} />
+            <Route path="/users/:userId/change-type" element={<UserTypeForm />} />
             {/* Add more staff-only pages here */}
           </Route>
         </Route>

@@ -30,3 +30,15 @@
   flex-direction: column;
   gap: 0.25rem;
 }
+
+.user-role-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.user-role-tag {
+  min-width: 70px;
+  justify-content: center;
+}

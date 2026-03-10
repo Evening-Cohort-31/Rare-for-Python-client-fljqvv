@@ -55,6 +55,11 @@
   position: relative;
 }
 
+.user-role-tag {
+  min-width: 70px;
+  justify-content: center;
+}
+
 .reaction-pop {
   position: absolute;
   top: -10px;
@@ -107,6 +112,14 @@
 .post-form-card .textarea {
   min-height: 260px;
   line-height: 1.6;
+}
+
+.user-profiles-card {
+  border-radius: 12px;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+  margin: 0.2rem auto;
 }
 
 @keyframes reactionPop {
