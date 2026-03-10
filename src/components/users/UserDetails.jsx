@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getUserById } from "../../services";
 import { ProfileImage } from "./ProfileImage.jsx";
+import { SubscribeButton } from "./SubscribeButton"
 
 export const UserDetails = () => {
   const { userId } = useParams();
@@ -61,13 +62,12 @@ export const UserDetails = () => {
             </Link>
           </div>
           <div className="column is-3 has-text-right">
-            <Button
-              variant="primary"
-              className="mb-4"
-              title="Subscribe to this author(coming soon Ticket #31)"
-            >
-              Subscribe
-            </Button>
+              <SubscribeButton 
+                        variant="primary" 
+                        className="mb-4"
+                        authorId = {author.id}
+                        formatDate = {formatDate}
+                        title="Subscribe to this author"/> 
           </div>
         </div>
       </Card>
