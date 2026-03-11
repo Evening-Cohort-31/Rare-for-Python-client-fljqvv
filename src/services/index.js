@@ -1,3 +1,6 @@
+// API service exports
+export { API_BASE_URL } from "./apiSettings.js";
+
 // Users
 export {
   getUserById,
@@ -54,6 +57,14 @@ export {
   getTagById,
   editTag,
 } from "./TagService.js";
+
+// Images/Avatars
+export {
+  getAvatars,
+  uploadFile,
+  uploadProfileImage,
+  getPreviouslyUploadedImages
+} from "./ImageService.js";
 
 // Demotion Queue
 export {
