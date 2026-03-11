@@ -88,7 +88,7 @@ export const UserProfiles = () => {
     return () => {
       isMounted = false;
     };
-  }, [activeFilter, refreshKey]);
+  }, [activeFilter, refreshKey, currentUser.id]);
 
   // Handle activate/deactivate user. Shows confirmation dialog first, then calls API to update user status if confirmed.
   const handleToggleActive = (user) => {
@@ -131,7 +131,7 @@ export const UserProfiles = () => {
   };
 
   //only change role if not changing own role and if not demoting last admin
-  //change role and if demoting admin, add to demotion queue. Admins can only be demoted by other admins and it requires two admin approvals to be fully demoted.
+  //if demoting admin, add to demotion queue and it requires two admin approvals to be fully demoted.
   // If the target user is already in the demotion queue, update demotion queue with approver_id and status = "approved" then update the user info with new role.
   // If the target user is not in the demotion queue, create a new entry with initiator_id, target_admin_id, and status = "pending".
   const handleChangeRole = (user) => {
@@ -190,7 +190,7 @@ export const UserProfiles = () => {
       return;
     }
 
-    // Try Catch block to handle the asynchronous API calls for updating user roles and managing the demotion queue.
+    // Try block to handle the asynchronous API calls for updating user roles and managing the demotion queue.
     // This includes error handling to show appropriate messages if something goes wrong.
     try {
       // If demoting an admin, we need to check the demotion queue to see if there is already a pending entry for this user.
@@ -219,6 +219,7 @@ export const UserProfiles = () => {
             status: "approved",
           });
 
+          // Now that the demotion request has been approved by a second admin, update the user's role to complete the demotion.
           await updateUser(selectedRoleUser.id, {
             ...selectedRoleUser,
             is_staff: false,
@@ -265,6 +266,7 @@ export const UserProfiles = () => {
     }
   };
 
+  // Handle confirming the cancellation of a pending demotion request. This will call the API to delete the demotion queue entry, which effectively cancels the request and prevents it from being approved by another admin.
   const handleConfirmCancelDemotion = async () => {
     if (!selectedDemotionRequest || !currentUser) return;
 
@@ -287,6 +289,7 @@ export const UserProfiles = () => {
     }
   };
 
+  // Handle canceling the cancellation of a pending demotion request, which just closes the confirmation dialog and resets the selected demotion request state.
   const handleCancelDemotionDialog = () => {
     setSelectedDemotionRequest(null);
   };
