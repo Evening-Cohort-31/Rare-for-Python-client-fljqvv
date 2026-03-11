@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { updatePost, getAllCategories, getPostById } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 import { useParams, useNavigate } from "react-router-dom";
+import { Container, FormField, FormSelect, PageHeader } from "../../design";
 
 export const EditPost = () => {
   const { postId } = useParams();
@@ -11,6 +12,7 @@ export const EditPost = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
+
 
   useEffect(() => {
     if (!currentUser) return;
@@ -79,29 +81,76 @@ export const EditPost = () => {
   //Form to edit an existing post's title, content, and category, pre-populated with the post's current data
 
   return (
-    <form onSubmit={handleSubmit}>
-        <h2>Edit Post</h2>
-        <div>
-            <label htmlFor="title">Title:</label>
-            <input type="text" id="title" name="title" value={post.title} onChange={handleInputChange} required />
-        </div>
-        <div>
-            <label htmlFor="content">Content:</label>
-            <textarea id="content" name="content" value={post.content} onChange={handleInputChange} required />
-        </div>
-        <div>
-            <label htmlFor="category">Category:</label>
-            <select id="category" name="category_id" value={post.category_id} onChange={handleInputChange} required>
-            <option value="">Select a category</option>
-            {categories.map(category => (
-                <option key={category.id} value={category.id}>{category.label}</option>
-            ))}
+    <Container>
+       <PageHeader title="Edit Post" />
+        <form onSubmit={handleSubmit}>
+
+          <FormField label="Title">
+            <input
+              className="input" 
+              type="text" 
+              id="title" 
+              name="title" 
+              value={post.title} 
+              onChange={handleInputChange} 
+              required 
+            />
+          </FormField>
+
+          <FormField label="Image URL">
+            <input
+              className="input"
+              type="url"
+              name="image_url"
+              value={post.image_url}
+              onChange={handleInputChange}
+            />
+          </FormField>
+
+          <FormField label="content">
+            <textarea 
+              className="input"
+              type="text"
+              name="content"
+              rows={6}
+              value={post.content} 
+              onChange={handleInputChange} 
+              required />
+          </FormField>
+
+          <FormSelect label="Category">
+            <select 
+              name="category_id" 
+              value={post.category_id} 
+              onChange={handleInputChange} 
+              required>
+              <option 
+                value="">Select a category
+              </option>
+              {categories.map(category => (
+                <option key={category.id} 
+                        value={category.id}>
+                        {category.label}
+                </option>
+              ))}
             </select>
-        </div>
+          </FormSelect>    
+           
+
         <div>
-            <button type="submit">Save Changes</button>
-            <button type="button" onClick={() => navigate("/my-posts")}>Cancel</button>
+            <button 
+              className="button is-primary" 
+              type="submit">
+              Save Changes
+            </button>
+            <button 
+              className="button is-danger ml-4" 
+              type="button" 
+              onClick={() => navigate("/my-posts")}>
+              Cancel
+            </button>
         </div>
     </form>
+    </Container>
   );
 }

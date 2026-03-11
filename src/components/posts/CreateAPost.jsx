@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { createPost, getAllCategories } from "../../services";
-import { Container, PageHeader, FormField, FormTextarea, FormSelect } from "../../design";
+import { Container, PageHeader, FormField, FormSelect } from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
 
 export const CreateAPost = () => {
@@ -13,8 +13,10 @@ export const CreateAPost = () => {
     image_url: "",
     content: "",
     category_id: 0,
-    tag_ids: []
+    tag_ids: [],
+    approved: currentUser?.is_staff === true ? 1 : 0 // Auto-approve if the current user is staff, otherwise default to false
   });
+
   const [categories, setCategories] = useState([]);
   const navigate = useNavigate();
 
@@ -90,16 +92,17 @@ export const CreateAPost = () => {
           />
         </FormField>
 
-        <FormTextarea label="Content">
-          <textarea
-            className="textarea"
+        <FormField label="Content">
+          <input
+            className="input"
+            type="text"
             name="content"
             placeholder="Write your article..."
             value={post.content}
             onChange={handleChange}
             required
           />
-        </FormTextarea>
+        </FormField>
 
         <FormSelect label="Category">
           <select name="category_id" value={post.category_id} onChange={handleCategoryChange}>
