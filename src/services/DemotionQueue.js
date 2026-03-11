@@ -1,17 +1,25 @@
 import { fetchJson, postJson, putJson, deleteJson } from "./apiSettings";
 
-export function getDemotionQueueByTargetIdStatusPending(targetId) {
-    return fetchJson(`/demotionQueue?target_id=${targetId}&status=pending`);
+export const getAllDemotionQueueEntries = () => {
+    return fetchJson("/demotionqueue")
+}
+
+export const getPendingDemotionQueueByTargetId = (targetAdminId) => {
+    return fetchJson(`/demotionqueue?target_admin_id=${targetAdminId}&status=pending`)
+}
+
+export const getPendingDemotionQueueByInitiatorId = (initiatorId) => {
+    return fetchJson(`/demotionqueue?initiator_id=${initiatorId}&status=pending`)
 }
 
 export function createDemotionQueueEntry(entry) {
-    return postJson("/demotionQueue", entry);
+    return postJson("/demotionqueue", entry);
 }
 
 export function updateDemotionQueueEntry(entryId, entryData) {
-    return putJson(`/demotionQueue/${entryId}`, entryData);
+    return putJson(`/demotionqueue/${entryId}`, entryData);
 }
 
-export function deleteDemotionQueueEntry(id) {
-    return deleteJson(`/demotionQueue/${id}`);
+export function deleteDemotionQueueEntry(id, initiatorId) {
+    return deleteJson(`/demotionqueue/${id}?initiator_id=${initiatorId}`);
 };

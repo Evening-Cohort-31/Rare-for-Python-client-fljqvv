@@ -4,7 +4,8 @@ import { useNavigate } from "react-router-dom";
 import {
   getAllUsers,
   updateUser,
-  getDemotionQueueByTargetIdStatusPending,
+  getPendingDemotionQueueByInitiatorId,
+  getPendingDemotionQueueByTargetId,
   createDemotionQueueEntry,
   updateDemotionQueueEntry,
   deleteDemotionQueueEntry,
@@ -31,6 +32,9 @@ export const UserProfiles = () => {
   const [selectedRoleUser, setSelectedRoleUser] = useState(null);
   const [selectedUserType, setSelectedUserType] = useState("");
   const [roleSubmitError, setRoleSubmitError] = useState("");
+  const [pendingDemotionRequests, setPendingDemotionRequests] = useState([]);
+  const [selectedDemotionRequest, setSelectedDemotionRequest] = useState(null);
+  const cancelDemotionDialogRef = useRef();
   const [loading, setLoading] = useState(true);
 
   // Incrementing this triggers the useEffect to re-fetch users after an update.
@@ -49,9 +53,8 @@ export const UserProfiles = () => {
       try {
         const allUsersData = await getAllUsers();
         let usersData;
-
-        setAllUsers(
-          allUsersData.map((u) => ({ ...u, active: Boolean(u.active) })),
+        const pendingRequests = await getPendingDemotionQueueByInitiatorId(
+          currentUser.id,
         );
 
         if (activeFilter === "active") {
@@ -67,6 +70,10 @@ export const UserProfiles = () => {
         }
 
         if (isMounted) {
+          setAllUsers(
+            allUsersData.map((u) => ({ ...u, active: Boolean(u.active) })),
+          );
+          setPendingDemotionRequests(pendingRequests);
           setUsers(usersData.map((u) => ({ ...u, active: Boolean(u.active) })));
         }
       } finally {
@@ -117,6 +124,12 @@ export const UserProfiles = () => {
     setRoleSubmitError("");
   };
 
+  // Handle click on "Cancel Demotion Request" button in the UI. This allows an admin to cancel their own pending demotion request for a user, which will remove the request from the queue and prevent the demotion from being approved by another admin.
+  const handleRequestCancelDemotion = (queueEntry) => {
+    setSelectedDemotionRequest(queueEntry);
+    cancelDemotionDialogRef.current?.showModal();
+  };
+
   //only change role if not changing own role and if not demoting last admin
   //change role and if demoting admin, add to demotion queue. Admins can only be demoted by other admins and it requires two admin approvals to be fully demoted.
   // If the target user is already in the demotion queue, update demotion queue with approver_id and status = "approved" then update the user info with new role.
@@ -149,7 +162,7 @@ export const UserProfiles = () => {
   };
 
   // After confirming role change, this function handles the logic for promoting an author to admin immediately
-  // For demoting an admin, it requires checking the demotion queue and potentially adding to it. 
+  // For demoting an admin, it requires checking the demotion queue and potentially adding to it.
   // It also handles error cases and updates the UI with notifications.
   const handleConfirmRoleChange = async () => {
     if (!selectedRoleUser) return;
@@ -177,15 +190,18 @@ export const UserProfiles = () => {
       return;
     }
 
-    // Try Catch block to handle the asynchronous API calls for updating user roles and managing the demotion queue. 
+    // Try Catch block to handle the asynchronous API calls for updating user roles and managing the demotion queue.
     // This includes error handling to show appropriate messages if something goes wrong.
     try {
       // If demoting an admin, we need to check the demotion queue to see if there is already a pending entry for this user.
       if (isDemotingAdmin) {
-        const pendingEntries = await getDemotionQueueByTargetIdStatusPending(
+        const pendingEntries = await getPendingDemotionQueueByTargetId(
           selectedRoleUser.id,
         );
 
+        // If there is a pending entry, it means another admin has already initiated a demotion request for this user.
+        // We need to check if the current user is the initiator of that request. If so, we cannot approve it ourselves and must show an error message.
+        // If the current user is not the initiator, then we can approve the pending request, which will update the queue entry and then update the user's role to complete the demotion.
         if (pendingEntries && pendingEntries.length > 0) {
           const pendingEntry = pendingEntries[0];
 
@@ -211,10 +227,6 @@ export const UserProfiles = () => {
           setNotification(
             `Demotion approved. ${selectedRoleUser.first_name} ${selectedRoleUser.last_name} has been changed from Admin to Author.`,
           );
-
-          // Optional later:
-          // await deleteDemotionQueueEntry(pendingEntry.id)
-          // OR keep it as an approved/completed audit record
         } else {
           // First admin request: queue only, no role change yet
           await createDemotionQueueEntry({
@@ -253,6 +265,32 @@ export const UserProfiles = () => {
     }
   };
 
+  const handleConfirmCancelDemotion = async () => {
+    if (!selectedDemotionRequest || !currentUser) return;
+
+    try {
+      await deleteDemotionQueueEntry(
+        selectedDemotionRequest.id,
+        currentUser.id,
+      );
+
+      setNotification("Pending demotion request canceled.");
+      setSelectedDemotionRequest(null);
+      setRefreshKey((prev) => prev + 1);
+
+      if (cancelDemotionDialogRef.current?.open) {
+        cancelDemotionDialogRef.current.close();
+      }
+    } catch (error) {
+      console.error("Failed to cancel demotion request:", error);
+      setNotification("Failed to cancel demotion request. Please try again.");
+    }
+  };
+
+  const handleCancelDemotionDialog = () => {
+    setSelectedDemotionRequest(null);
+  };
+
   // Access control: only staff users can view this page
   if (!currentUser || !currentUser.is_staff) {
     navigate("/access-denied", { replace: true });
@@ -285,8 +323,10 @@ export const UserProfiles = () => {
       <UserTable
         users={users}
         currentUser={currentUser}
+        pendingDemotionRequests={pendingDemotionRequests}
         onToggleActive={handleToggleActive}
         onChangeRole={handleChangeRole}
+        onCancelDemotionRequest={handleRequestCancelDemotion}
       />
 
       <ConfirmDialog
@@ -312,6 +352,20 @@ export const UserProfiles = () => {
         onCancel={handleCancelRoleChange}
         roleSubmitError={roleSubmitError}
         onClearError={() => setRoleSubmitError("")}
+      />
+
+      <ConfirmDialog
+        dialogRef={cancelDemotionDialogRef}
+        title="Cancel Demotion Request"
+        message={
+          selectedDemotionRequest
+            ? "Are you sure you want to cancel this pending demotion request?"
+            : ""
+        }
+        confirmText="Yes, Cancel Request"
+        confirmColor="is-danger"
+        onConfirm={handleConfirmCancelDemotion}
+        onCancel={handleCancelDemotionDialog}
       />
     </Container>
   );

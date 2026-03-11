@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, Tag, Button } from "../../design";
 
-export const UserTable = ({ users, currentUser, onToggleActive, onChangeRole }) => (
+export const UserTable = ({ users, currentUser, pendingDemotionRequests, onToggleActive, onChangeRole, onCancelDemotionRequest }) => (
   <Card className="user-profiles-card">
     <div className="table-container">
       <table className="table is-striped is-hoverable">
@@ -78,17 +78,30 @@ export const UserTable = ({ users, currentUser, onToggleActive, onChangeRole }) 
                     {user.is_staff ? "👑 Admin" : "✍️ Author"}
                   </Tag>
 
-                  {user.id !== currentUser.id && (
-                    <Button
-                      color="warning"
-                      size="small"
-                      onClick={() => onChangeRole(user)}
-                    >
-                      {user.is_staff ? "Demote to Author" : "Promote to Admin"}
-                    </Button>
-                  )}
-                </div>
-              </td>
+                    {user.id !== currentUser.id && (
+                      pendingDemotionRequests.some((req) => req.target_admin_id === user.id && req.initiator_id === currentUser.id) ? (
+                        <Button
+                          color="danger"
+                          size="small"
+                          onClick={() => {
+                            const userPendingRequest = pendingDemotionRequests.find((req) => req.target_admin_id === user.id && req.initiator_id === currentUser.id);
+                            onCancelDemotionRequest(userPendingRequest);
+                          }}
+                        >
+                          Cancel Demotion Request
+                        </Button>
+                      ) : (
+                        <Button
+                          color="warning"
+                          size="small"
+                          onClick={() => onChangeRole(user)}
+                        >
+                          {user.is_staff ? "Demote to Author" : "Promote to Admin"}
+                        </Button>
+                      )
+                    )}
+                  </div>
+                </td>
             </tr>
           ))}
         </tbody>

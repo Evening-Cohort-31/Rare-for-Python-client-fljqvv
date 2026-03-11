@@ -57,7 +57,9 @@ export {
 
 // Demotion Queue
 export {
-  getDemotionQueueByTargetIdStatusPending,
+  getAllDemotionQueueEntries,
+  getPendingDemotionQueueByTargetId,
+  getPendingDemotionQueueByInitiatorId,
   createDemotionQueueEntry,
   updateDemotionQueueEntry,
   deleteDemotionQueueEntry,
