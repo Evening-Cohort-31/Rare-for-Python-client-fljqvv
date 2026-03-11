@@ -1,7 +1,14 @@
 // Component for displaying all user profiles.
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { getAllUsers, updateUser } from "../../services/index.js";
+import {
+  getAllUsers,
+  updateUser,
+  getDemotionQueueByTargetIdStatusPending,
+  createDemotionQueueEntry,
+  updateDemotionQueueEntry,
+  deleteDemotionQueueEntry,
+} from "../../services/index.js";
 import {
   Loading,
   PageHeader,
@@ -76,11 +83,13 @@ export const UserProfiles = () => {
     };
   }, [activeFilter, refreshKey]);
 
+  // Handle activate/deactivate user. Shows confirmation dialog first, then calls API to update user status if confirmed.
   const handleToggleActive = (user) => {
     setSelectedUser(user);
     dialogRef.current.showModal();
   };
 
+  // After confirming activate/deactivate, call API to update user and refresh list. Also handles errors.
   const handleConfirmToggle = async () => {
     if (!selectedUser) return;
 
@@ -96,27 +105,36 @@ export const UserProfiles = () => {
     }
   };
 
+  // Cancel activate/deactivate action, just close dialog and reset selected user.
   const handleCancelToggle = () => {
     setSelectedUser(null);
   };
 
+  // Handle change role button click. Shows change role modal with current role pre-selected.
   const handleCancelRoleChange = () => {
     setSelectedRoleUser(null);
     setSelectedUserType("");
     setRoleSubmitError("");
   };
 
+  //only change role if not changing own role and if not demoting last admin
+  //change role and if demoting admin, add to demotion queue. Admins can only be demoted by other admins and it requires two admin approvals to be fully demoted.
+  // If the target user is already in the demotion queue, update demotion queue with approver_id and status = "approved" then update the user info with new role.
+  // If the target user is not in the demotion queue, create a new entry with initiator_id, target_admin_id, and status = "pending".
   const handleChangeRole = (user) => {
     setNotification("");
     setRoleSubmitError("");
 
+    // Get the current count of admin users to enforce the rule that there must always be at least one admin.
     const adminCount = allUsers.filter((u) => u.is_staff).length;
 
+    // Prevent changing own role to avoid accidentally locking oneself out of admin privileges.
     if (user.id === currentUser.id) {
       setNotification("You cannot change your own user type.");
       return;
     }
 
+    // If demoting an admin, check if they are the last admin. If so, prevent the action and show a notification.
     if (user.is_staff && adminCount === 1) {
       setNotification(
         "This is the last Admin. Please promote another user to Admin before demoting this user.",
@@ -124,35 +142,103 @@ export const UserProfiles = () => {
       return;
     }
 
+    // Open the change role modal and set the selected user and their current role (admin or author).
     setSelectedRoleUser(user);
     setSelectedUserType(user.is_staff ? "admin" : "author");
     roleDialogRef.current?.showModal();
   };
 
+  // After confirming role change, this function handles the logic for promoting an author to admin immediately
+  // For demoting an admin, it requires checking the demotion queue and potentially adding to it. 
+  // It also handles error cases and updates the UI with notifications.
   const handleConfirmRoleChange = async () => {
     if (!selectedRoleUser) return;
 
     setRoleSubmitError("");
+    setNotification("");
 
+    // Get the current count of admin users to enforce the rule that there must always be at least one admin.
     const adminCount = allUsers.filter((u) => u.is_staff).length;
+    // Check if the action is demoting an admin to author, which has special rules around the demotion queue and requires two admin approvals.
+    const isDemotingAdmin =
+      selectedRoleUser.is_staff && selectedUserType === "author";
 
+    // Prevent changing own role to avoid accidentally locking oneself out of admin privileges.
     if (selectedRoleUser.id === currentUser.id) {
       setRoleSubmitError("You cannot change your own user type.");
       return;
     }
 
-    if (selectedRoleUser.is_staff && selectedUserType === "author" && adminCount === 1) {
+    // If demoting an admin, check if they are the last admin. If so, prevent the action and show an error message.
+    if (isDemotingAdmin && adminCount === 1) {
       setRoleSubmitError(
         "This is the last Admin. Please promote another user to Admin before demoting this user.",
       );
       return;
     }
 
+    // Try Catch block to handle the asynchronous API calls for updating user roles and managing the demotion queue. 
+    // This includes error handling to show appropriate messages if something goes wrong.
     try {
-      await updateUser(selectedRoleUser.id, {
-        ...selectedRoleUser,
-        is_staff: selectedUserType === "admin",
-      });
+      // If demoting an admin, we need to check the demotion queue to see if there is already a pending entry for this user.
+      if (isDemotingAdmin) {
+        const pendingEntries = await getDemotionQueueByTargetIdStatusPending(
+          selectedRoleUser.id,
+        );
+
+        if (pendingEntries && pendingEntries.length > 0) {
+          const pendingEntry = pendingEntries[0];
+
+          if (pendingEntry.initiator_id === currentUser.id) {
+            setRoleSubmitError(
+              "You already submitted this demotion request. A different admin must approve it.",
+            );
+            return;
+          }
+
+          // Second admin approval: approve queue entry, then demote user
+          await updateDemotionQueueEntry(pendingEntry.id, {
+            ...pendingEntry,
+            approver_id: currentUser.id,
+            status: "approved",
+          });
+
+          await updateUser(selectedRoleUser.id, {
+            ...selectedRoleUser,
+            is_staff: false,
+          });
+
+          setNotification(
+            `Demotion approved. ${selectedRoleUser.first_name} ${selectedRoleUser.last_name} has been changed from Admin to Author.`,
+          );
+
+          // Optional later:
+          // await deleteDemotionQueueEntry(pendingEntry.id)
+          // OR keep it as an approved/completed audit record
+        } else {
+          // First admin request: queue only, no role change yet
+          await createDemotionQueueEntry({
+            action: "demote_admin",
+            target_admin_id: selectedRoleUser.id,
+            initiator_id: currentUser.id,
+            status: "pending",
+          });
+
+          setNotification(
+            `Demotion for ${selectedRoleUser.first_name} ${selectedRoleUser.last_name} was added to the queue. A second Admin is required to complete it.`,
+          );
+        }
+      } else {
+        // Promote Author -> Admin immediately
+        await updateUser(selectedRoleUser.id, {
+          ...selectedRoleUser,
+          is_staff: selectedUserType === "admin",
+        });
+
+        setNotification(
+          `${selectedRoleUser.first_name} ${selectedRoleUser.last_name} has been promoted to Admin.`,
+        );
+      }
 
       setSelectedRoleUser(null);
       setSelectedUserType("");

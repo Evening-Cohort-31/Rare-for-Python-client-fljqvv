@@ -54,3 +54,11 @@ export {
   getTagById,
   editTag,
 } from "./TagService.js";
+
+// Demotion Queue
+export {
+  getDemotionQueueByTargetIdStatusPending,
+  createDemotionQueueEntry,
+  updateDemotionQueueEntry,
+  deleteDemotionQueueEntry,
+} from "./DemotionQueue.js";
