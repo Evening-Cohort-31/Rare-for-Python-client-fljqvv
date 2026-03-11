@@ -1,4 +1,6 @@
 // Component for displaying all user profiles.
+// This component is only accessible to staff users and allows them to view all users, filter by active/inactive/authors/admins, activate/deactivate users, and change user roles between author and admin. It also implements a demotion queue system for demoting admins, which requires two admin approvals to complete the demotion. The component uses various API calls to fetch users, update user status and roles, and manage the demotion queue. It also includes confirmation dialogs for critical actions and notifications for success/error messages.
+// Comments have been added throughout the code to explain the purpose and functionality of each part, especially around the complex logic for handling role changes and the demotion queue. The code is structured with React hooks for state management and side effects, and it uses a combination of custom components for the UI.
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import {
