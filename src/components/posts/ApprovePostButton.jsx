@@ -21,6 +21,7 @@ export const ApprovePostButton = ({post}) => {
 
     return (
         <Button
+            color= "info"
             onClick={handleClick}
         >
             Approve Post #{post.id}

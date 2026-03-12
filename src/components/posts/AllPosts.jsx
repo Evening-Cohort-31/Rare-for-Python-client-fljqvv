@@ -29,13 +29,14 @@ export const AllPosts = () => {
     });
   }, []);
 
-  if (loading) {
-    return <Loading />;
-  }
-
   const visiblePosts = currentUser?.is_staff === true
       ? posts
       : posts.filter(post => post.approved === 1)
+
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <Container>
