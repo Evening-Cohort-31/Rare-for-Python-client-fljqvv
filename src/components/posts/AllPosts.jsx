@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { getAllPosts } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
-// CHANGED: Added Link alongside useNavigate (Added on view_post_details_5)
 import { Loading, PageHeader, Card, Container } from "../../design";
 import { ReactionBar } from "../reactions/ReactionBar.jsx";
 import { ApprovePostButton } from "./ApprovePostButton.jsx";
@@ -46,6 +45,23 @@ export const AllPosts = () => {
         {visiblePosts.map((post) => (
           <div className="column is-half" key={post.id}>
             <Card title={<Link to={`/posts/${post.id}`}>{post.title}</Link>}>
+            <div className="buttons">
+                  {currentUser && currentUser.id === post.user_id && (
+                    <button 
+                      className ="button" 
+                      onClick={() => navigate(`/my-posts/edit/${post.id}`)}>
+                      Edit Post
+                    </button>
+                    )}
+                  {currentUser.is_staff ? (
+                    <ApprovePostButton
+                      className="button"
+                      post={post}/>
+                  ) : null}
+             </div>
+              <div className="mt-3">
+                  <ReactionBar postId={post.id} />
+              </div>
               <p>
                 <strong>Author:</strong> {post.author}
               </p>
@@ -55,22 +71,7 @@ export const AllPosts = () => {
               <p>
                 <strong>Date:</strong> {formatDate(post.publication_date)}
               </p>
-              <div className="buttons">
-                  {currentUser && currentUser.id === post.user_id && (
-                    <button className ="button" onClick={() => navigate(`/my-posts/edit/${post.id}`)}>
-                  Edit Post
-                </button>
-                    )}
-                  { currentUser.is_staff === true && post.approved === 0 && (
-                    <ApprovePostButton
-                      className="button"
-                      post={post}/>
-                  )}
-             </div>
-             <hr />
-                <div className="mt-3">
-                  <ReactionBar postId={post.id} />
-                </div>
+              
           </Card>
           </div>
         ))}

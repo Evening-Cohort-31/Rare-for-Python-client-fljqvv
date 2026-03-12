@@ -1,32 +1,34 @@
-import { Button } from "../../design"
-import { updatePost } from "../../services"
-import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { updatePost } from "../../services";
 
-
-
-export const ApprovePostButton = ({post}) => {
-
-    const navigate = useNavigate();
-
+export const ApprovePostButton = ({ post }) => {
+    const [isApproved, setIsApproved] = useState(post.approved);
 
     const handleClick = (e) => {
-
         e.preventDefault();
-        const postData = { ...post, approved: 1 }
+        const postData = { ...post, approved: isApproved ? 0 : 1 };
         updatePost(post.id, postData).then(() => {
-            navigate(0); // Refresh the page
-        })
-
-    }
+            setIsApproved(postData.approved);
+        });
+    };
 
     return (
-        <Button
-            color= "info"
-            onClick={handleClick}
-        >
-            Approve Post #{post.id}
-        </Button>
-    )
+       
+        <label className="radio box button" style={{ cursor: "pointer" }}>
+            <input
+                type="radio"
+                checked={!!isApproved}
+                onChange={handleClick}
+                style={{ display: "none" }}
+            />
+            <span
+                className={`icon ${isApproved ? "has-text-success" : "has-text-grey-light"}`}
+                onClick={handleClick}
+            >
+                <i className={`fas ${isApproved ? "fa-check-circle" : "fa-circle"}`} />
+            </span>
+            <span>{isApproved ? "Approved" : "Unapproved"}</span>
+        </label>
     
-
-}
+    );
+};

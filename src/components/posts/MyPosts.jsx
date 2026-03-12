@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getPostsByUserIdExpandCategory } from "../../services";
 import { useCurrentUser } from "../../context/CurrentUserContext.js";
-import { Container, PageHeader, Loading, Card } from "../../design";
+import { Container, PageHeader, Card } from "../../design";
 
 // React component to display all of the current logged in user's posts
 export const MyPosts = () => {
