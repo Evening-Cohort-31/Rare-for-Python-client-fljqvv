@@ -38,9 +38,8 @@ export const NavBar = ({ token, setToken }) => {
               <>
                 {/* Non-staff user links */}
                 <Link to="/my-posts" className="navbar-item">My Posts</Link>
-                <Link to="/categories" className="navbar-item">Category Management</Link>
                 <Link to="/all-posts" className="navbar-item">All Posts</Link>
-                <Link to="/bulma-sampler" className="navbar-item">Bulma Sampler</Link>
+                {/* <Link to="/bulma-sampler" className="navbar-item">Bulma Sampler</Link> */}
                 {currentUser?.id && (
                   <Link to={`/users/${currentUser.id}`} className="navbar-item">My Profile</Link>
                 )}
@@ -49,6 +48,7 @@ export const NavBar = ({ token, setToken }) => {
                 {/* Staff-only links */}
                 {currentUser?.is_staff && (
                   <>
+                    <Link to="/categories" className="navbar-item">Category Management</Link>
                     <Link to="/users" className="navbar-item">
                       User Profiles
                     </Link>
