@@ -26,35 +26,37 @@ export const EditPostTagsDialog = ({
   const [isSaving, setIsSaving] = useState(false);
   const [notification, setNotification] = useState("");
 
-  // Open dialog + fetch needed data
-  useEffect(() => {
+  const loadDialogData = async () => {
     if (!post?.id) return;
 
-    const loadDialogData = async () => {
-      setLoading(true);
+    setLoading(true);
+    setNotification("");
 
-      try {
-        const [fetchedPostTags, fetchedAllTags] = await Promise.all([
-          getTagsByPostId(post.id),
-          getAllTags(),
-        ]);
+    try {
+      const [fetchedPostTags, fetchedAllTags] = await Promise.all([
+        getTagsByPostId(post.id),
+        getAllTags(),
+      ]);
 
-        setPostTags(fetchedPostTags ?? []);
-        setAllTags(fetchedAllTags ?? []);
-      } catch (error) {
-        console.error("Failed to load tag editor data:", error);
-        setPostTags([]);
-        setAllTags([]);
-        setNotification("Failed to load tags.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      setPostTags(fetchedPostTags ?? []);
+      setAllTags(fetchedAllTags ?? []);
+    } catch (error) {
+      console.error("Failed to load tag editor data:", error);
+      setPostTags([]);
+      setAllTags([]);
+      setNotification("Failed to load tags.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Load data when dialog mounts / post changes
+  useEffect(() => {
+    if (!post?.id) return;
     loadDialogData();
   }, [post?.id]);
 
-  // Show the dialog after mount
+  // Show dialog after mount
   useEffect(() => {
     dialogRef.current?.showModal();
   }, []);
@@ -64,21 +66,23 @@ export const EditPostTagsDialog = ({
     return new Set(postTags.map((tag) => tag.id));
   }, [postTags]);
 
-  // Only show tags that are not already attached
+  // Only show tags not already attached
   const availableTagsToAdd = useMemo(() => {
     return allTags.filter((tag) => !attachedTagIds.has(tag.id));
   }, [allTags, attachedTagIds]);
 
-  const handleRemoveTag = async (tagId) => {
+  const handleRemoveTag = async (postTagId) => {
     if (!canRemoveTags) return;
 
     setIsSaving(true);
     setNotification("");
 
     try {
-      await removeTagFromPost(post.id, tagId);
+      await removeTagFromPost(postTagId);
 
-      setPostTags((current) => current.filter((tag) => tag.id !== tagId));
+      const refreshedPostTags = await getTagsByPostId(post.id);
+      setPostTags(refreshedPostTags ?? []);
+
       setNotification("Tag removed.");
     } catch (error) {
       console.error("Failed to remove tag from post:", error);
@@ -99,10 +103,8 @@ export const EditPostTagsDialog = ({
 
       await addTagToPost(post.id, tagId);
 
-      const addedTag = allTags.find((tag) => tag.id === tagId);
-      if (addedTag) {
-        setPostTags((current) => [...current, addedTag]);
-      }
+      const refreshedPostTags = await getTagsByPostId(post.id);
+      setPostTags(refreshedPostTags ?? []);
 
       setSelectedTagId("");
       setNotification("Tag added.");
@@ -117,21 +119,31 @@ export const EditPostTagsDialog = ({
   const handleCreateAndAddTag = async () => {
     if (!canCreateTags || !newTagLabel.trim()) return;
 
+    const trimmedLabel = newTagLabel.trim();
+    const normalizedNewTag = trimmedLabel.toLowerCase();
+
+    const tagAlreadyExists = allTags.some(
+      (tag) => tag.label.trim().toLowerCase() === normalizedNewTag
+    );
+
+    if (tagAlreadyExists) {
+      setNotification("That tag already exists.");
+      return;
+    }
+
     setIsSaving(true);
     setNotification("");
 
     try {
-      // Create the new tag first
-      const createdTag = await createTag({ label: newTagLabel.trim() });
+      const createdTag = await createTag({ label: trimmedLabel });
 
-      // Depending on your service, createdTag may already be the tag object
-      // with id + label. If not, you may need to re-fetch all tags here.
-      const usableTag = createdTag;
+      await addTagToPost(post.id, createdTag.id);
 
-      await addTagToPost(post.id, usableTag.id);
+      setAllTags((current) => [...current, createdTag]);
 
-      setAllTags((current) => [...current, usableTag]);
-      setPostTags((current) => [...current, usableTag]);
+      const refreshedPostTags = await getTagsByPostId(post.id);
+      setPostTags(refreshedPostTags ?? []);
+
       setNewTagLabel("");
       setNotification("New tag created and added.");
     } catch (error) {
@@ -162,15 +174,17 @@ export const EditPostTagsDialog = ({
             <Loading />
           ) : (
             <>
-              {/* Existing tags */}
               <div className="mb-4">
                 <p className="has-text-weight-semibold mb-2">Current Tags</p>
 
                 {postTags.length ? (
-                  <div className="is-flex is-flex-direction-column" style={{ gap: "0.75rem" }}>
+                  <div
+                    className="is-flex is-flex-direction-column"
+                    style={{ gap: "0.75rem" }}
+                  >
                     {postTags.map((tag) => (
                       <div
-                        key={tag.id}
+                        key={tag.postTagId}
                         className="is-flex is-justify-content-space-between is-align-items-center"
                         style={{ gap: "0.75rem" }}
                       >
@@ -183,7 +197,7 @@ export const EditPostTagsDialog = ({
                             color="danger"
                             light
                             disabled={isSaving}
-                            onClick={() => handleRemoveTag(tag.id)}
+                            onClick={() => handleRemoveTag(tag.postTagId)}
                           >
                             Remove
                           </Button>
@@ -192,46 +206,47 @@ export const EditPostTagsDialog = ({
                     ))}
                   </div>
                 ) : (
-                  <p className="is-size-7 has-text-grey">This post has no tags.</p>
+                  <p className="is-size-7 has-text-grey">
+                    This post has no tags.
+                  </p>
                 )}
               </div>
 
-              {/* Add existing tag */}
               {canAddTags ? (
                 <div className="mb-4">
-                  <p className="has-text-weight-semibold mb-2">Add Existing Tag</p>
+                  <p className="has-text-weight-semibold mb-2">
+                    Add Existing Tag
+                  </p>
 
                   {availableTagsToAdd.length ? (
-                    <>
-                      <div className="field has-addons">
-                        <div className="control is-expanded">
-                          <div className="select is-fullwidth">
-                            <select
-                              value={selectedTagId}
-                              onChange={(e) => setSelectedTagId(e.target.value)}
-                              disabled={isSaving}
-                            >
-                              <option value="">Select a tag</option>
-                              {availableTagsToAdd.map((tag) => (
-                                <option key={tag.id} value={tag.id}>
-                                  {tag.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-                        </div>
-
-                        <div className="control">
-                          <Button
-                            color="primary"
-                            disabled={isSaving || !selectedTagId}
-                            onClick={handleAddExistingTag}
+                    <div className="field has-addons">
+                      <div className="control is-expanded">
+                        <div className="select is-fullwidth">
+                          <select
+                            value={selectedTagId}
+                            onChange={(e) => setSelectedTagId(e.target.value)}
+                            disabled={isSaving}
                           >
-                            Add
-                          </Button>
+                            <option value="">Select a tag</option>
+                            {availableTagsToAdd.map((tag) => (
+                              <option key={tag.id} value={tag.id}>
+                                {tag.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
                       </div>
-                    </>
+
+                      <div className="control">
+                        <Button
+                          color="primary"
+                          disabled={isSaving || !selectedTagId}
+                          onClick={handleAddExistingTag}
+                        >
+                          Add
+                        </Button>
+                      </div>
+                    </div>
                   ) : (
                     <p className="is-size-7 has-text-grey">
                       No additional existing tags are available to add.
@@ -240,10 +255,11 @@ export const EditPostTagsDialog = ({
                 </div>
               ) : null}
 
-              {/* Create and add new tag */}
               {canCreateTags ? (
                 <div className="mb-3">
-                  <p className="has-text-weight-semibold mb-2">Create New Tag</p>
+                  <p className="has-text-weight-semibold mb-2">
+                    Create New Tag
+                  </p>
 
                   <div className="field has-addons">
                     <div className="control is-expanded">
@@ -270,9 +286,7 @@ export const EditPostTagsDialog = ({
                 </div>
               ) : null}
 
-              {notification ? (
-                <p className="help mt-2">{notification}</p>
-              ) : null}
+              {notification ? <p className="help mt-2">{notification}</p> : null}
             </>
           )}
         </div>

@@ -1,13 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button, Tag } from "../../design";
 import { useCurrentUser } from "../../context/CurrentUserContext";
 import { EditPostTagsDialog } from "./EditPostTagsDialog";
+import { getTagsByPostId } from "../../services";
 
 export const PostTagAside = ({ post, onTagsUpdated }) => {
   const { currentUser } = useCurrentUser();
   const [isEditingTags, setIsEditingTags] = useState(false);
+  const [tags, setTags] = useState([]);
 
-  const tags = post?.tags ?? [];
+  const postId = post?.id;
+
+  const fetchTags = useCallback(() => {
+    if (!postId) return;
+
+    getTagsByPostId(postId)
+      .then((fetchedTags) => {
+        setTags(fetchedTags ?? []);
+      })
+      .catch((error) => {
+        console.error("Failed to fetch tags for post:", error);
+        setTags([]);
+      });
+  }, [postId]);
+
+  useEffect(() => {
+    fetchTags();
+  }, [fetchTags]);
 
   const isOwner = currentUser?.id === post?.user_id;
   const isAdmin = currentUser?.is_staff === true;
@@ -63,6 +82,7 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
           onClose={() => setIsEditingTags(false)}
           onUpdated={() => {
             setIsEditingTags(false);
+            fetchTags();
             onTagsUpdated?.();
           }}
         />

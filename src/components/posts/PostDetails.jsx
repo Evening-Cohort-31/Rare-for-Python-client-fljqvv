@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 // useParams lets us read the :postId from the URL (e.g. /posts/5 → postId = "5")
 import { useParams, useNavigate, Link } from "react-router-dom";
 // Custom service function we created in PostService.js to fetch a single post by ID
@@ -16,6 +16,7 @@ import {
 
 import { DeletePostButton } from "../../design/DeletePostButton";
 import { ReactionBar } from "../reactions/ReactionBar.jsx";
+import { PostTagAside } from "./PostTagAside.jsx";
 
 // Displays a single post's full details when a user clicks a post title from a list
 export const PostDetails = () => {
@@ -24,13 +25,15 @@ export const PostDetails = () => {
   const navigate = useNavigate();
   // Holds the fetched post data; starts as null to trigger "Loading..." state
   const [post, setPost] = useState(null);
-  const [tagNotification, setTagNotification] = useState("");
-  const updateTagsDialogRef = useRef();
+
+  const fetchPost = useCallback(() => {
+    getPostByIdExpandCategoryExpandUser(postId).then(setPost);
+  }, [postId]);
 
   // Fetches the single post from the API when component mounts or postId changes
   useEffect(() => {
-    getPostByIdExpandCategoryExpandUser(postId).then(setPost);
-  }, [postId]);
+    fetchPost();
+  }, [postId, fetchPost]);
 
   // Show loading message while waiting for API response (post is still null)
   if (!post) return <Loading />;
@@ -46,7 +49,7 @@ export const PostDetails = () => {
         <h1 className="title is-2 has-text-centered mb-4">{post.title}</h1>
 
         {/* Row above the image:
-            - Left: edit/delete icons (dead links for now)
+            - Left: edit/delete icons
             - Right: category label
         */}
         <div className="level mb-3">
@@ -76,15 +79,23 @@ export const PostDetails = () => {
         </div>
 
         {/* Only render the header image if the post has an image_url */}
-        {post.image_url ? (
-          <figure className="image mb-4">
-            <img
-              src={post.image_url}
-              alt="Post header"
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-          </figure>
-        ) : null}
+        <div className="columns is-variable is-5">
+          <div className="column is-three-quarters">
+            {post.image_url ? (
+              <figure className="image mb-4">
+                <img
+                  src={post.image_url}
+                  alt="Post header"
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+              </figure>
+            ) : null}
+          </div>
+
+          <div className="column is-one-quarter">
+            <PostTagAside post={post} onTagsUpdated={fetchPost} />
+          </div>
+        </div>
 
         {/* Row under the image:
             - Left: author name
