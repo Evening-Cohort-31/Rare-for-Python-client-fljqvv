@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 // useParams lets us read the :postId from the URL (e.g. /posts/5 → postId = "5")
 import { useParams, useNavigate, Link } from "react-router-dom";
 // Custom service function we created in PostService.js to fetch a single post by ID
@@ -17,7 +17,6 @@ import {
 import { DeletePostButton } from "../../design/DeletePostButton";
 import { ReactionBar } from "../reactions/ReactionBar.jsx";
 
-// New component for Ticket #5 - View Post Details
 // Displays a single post's full details when a user clicks a post title from a list
 export const PostDetails = () => {
   // Extracts the postId from the URL parameter defined in ApplicationViews route
@@ -25,6 +24,8 @@ export const PostDetails = () => {
   const navigate = useNavigate();
   // Holds the fetched post data; starts as null to trigger "Loading..." state
   const [post, setPost] = useState(null);
+  const [tagNotification, setTagNotification] = useState("");
+  const updateTagsDialogRef = useRef();
 
   // Fetches the single post from the API when component mounts or postId changes
   useEffect(() => {

@@ -1,4 +1,4 @@
-import { fetchJson, postJson, deleteJson } from "./apiSettings";
+import { fetchJson, postJson, putJson, deleteJson } from "./apiSettings";
 
 // Function to get all tags from the API Ticket #10
 export const getAllTags = () => {
@@ -18,8 +18,17 @@ export const getTagById = (id) => {
 };
 
 export const editTag = (id, updatedTag) => {
-  return fetchJson(`/tags/${id}`, {
-    method: "PUT",
-    body: JSON.stringify(updatedTag),
-  });
+  return putJson(`/tags/${id}`, updatedTag);
+};
+
+export const getTagsByPostId = (postId) => {
+  return fetchJson(`/posts/${postId}/tags`);
+};
+
+export const addTagToPost = (postId, tagId) => {
+  return postJson(`/posts/${postId}/tags`, { tag_id: tagId });
+};
+
+export const removeTagFromPost = (postId, tagId) => {
+  return deleteJson(`/posts/${postId}/tags/${tagId}`);
 };
