@@ -55,17 +55,20 @@ export const PostDetails = () => {
         <div className="level mb-3">
           <div className="level-left">
             <div className="buttons are-small">
-              {/* "Edit post" (dead for now) */}
+              {/* "Edit post" */}
               <IconButton
                 icon="gear"
-                title="Edit post (coming soon)"
-                onClick={() => {}}
+                title="Edit post"
+                onClick={() => navigate(`/my-posts/edit/${post.id}`)}
               />
-              {/* "Delete post" (dead for now) */}
-              <IconButton
+              {/* "Delete post" */}
+              <DeletePostButton
                 icon="trash"
-                title="Delete post (coming soon)"
-                onClick={() => {}}
+                userId={post.user_id}
+                postId={post.id}
+                title="Delete post"
+                confirmTitle="Delete Post"
+                confirmMessage="Are you sure you want to delete this post? This action cannot be undone."
               />
             </div>
           </div>
@@ -121,13 +124,6 @@ export const PostDetails = () => {
               >
                 View Comments
               </Button>
-              <DeletePostButton
-                userId={post.user_id}
-                postId={post.id}
-                title="Delete Post"
-                confirmTitle="Delete Post"
-                confirmMessage="Are you sure you want to delete this post? This action cannot be undone."
-              />
             </div>
           </div>
 

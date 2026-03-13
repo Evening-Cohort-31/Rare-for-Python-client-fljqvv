@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ConfirmDialog, Tag, Button, Loading } from "../../design";
 import {
   getAllTags,
@@ -25,12 +25,14 @@ export const EditPostTagsDialog = ({
   const [newTagLabel, setNewTagLabel] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [notification, setNotification] = useState("");
+  const [notificationIsError, setNotificationIsError] = useState(false);
 
-  const loadDialogData = async () => {
+  const loadDialogData = useCallback(async () => {
     if (!post?.id) return;
 
     setLoading(true);
     setNotification("");
+    setNotificationIsError(false);
 
     try {
       const [fetchedPostTags, fetchedAllTags] = await Promise.all([
@@ -44,17 +46,17 @@ export const EditPostTagsDialog = ({
       console.error("Failed to load tag editor data:", error);
       setPostTags([]);
       setAllTags([]);
+      setNotificationIsError(true);
       setNotification("Failed to load tags.");
     } finally {
       setLoading(false);
     }
-  };
+  }, [post?.id]);
 
   // Load data when dialog mounts / post changes
   useEffect(() => {
-    if (!post?.id) return;
     loadDialogData();
-  }, [post?.id]);
+  }, [loadDialogData]);
 
   // Show dialog after mount
   useEffect(() => {
@@ -76,6 +78,7 @@ export const EditPostTagsDialog = ({
 
     setIsSaving(true);
     setNotification("");
+    setNotificationIsError(false);
 
     try {
       await removeTagFromPost(postTagId);
@@ -86,6 +89,7 @@ export const EditPostTagsDialog = ({
       setNotification("Tag removed.");
     } catch (error) {
       console.error("Failed to remove tag from post:", error);
+      setNotificationIsError(true);
       setNotification("Failed to remove tag.");
     } finally {
       setIsSaving(false);
@@ -97,6 +101,7 @@ export const EditPostTagsDialog = ({
 
     setIsSaving(true);
     setNotification("");
+    setNotificationIsError(false);
 
     try {
       const tagId = parseInt(selectedTagId);
@@ -110,6 +115,7 @@ export const EditPostTagsDialog = ({
       setNotification("Tag added.");
     } catch (error) {
       console.error("Failed to add tag to post:", error);
+      setNotificationIsError(true);
       setNotification("Failed to add tag.");
     } finally {
       setIsSaving(false);
@@ -127,12 +133,14 @@ export const EditPostTagsDialog = ({
     );
 
     if (tagAlreadyExists) {
+      setNotificationIsError(true);
       setNotification("That tag already exists.");
       return;
     }
 
     setIsSaving(true);
     setNotification("");
+    setNotificationIsError(false);
 
     try {
       const createdTag = await createTag({ label: trimmedLabel });
@@ -148,6 +156,7 @@ export const EditPostTagsDialog = ({
       setNotification("New tag created and added.");
     } catch (error) {
       console.error("Failed to create and add tag:", error);
+      setNotificationIsError(true);
       setNotification("Failed to create and add tag.");
     } finally {
       setIsSaving(false);
@@ -286,7 +295,11 @@ export const EditPostTagsDialog = ({
                 </div>
               ) : null}
 
-              {notification ? <p className="help mt-2">{notification}</p> : null}
+              {notification ? (
+                <p className={`help mt-2 ${notificationIsError ? "has-text-danger" : "has-text-success"}`}>
+                  {notification}
+                </p>
+              ) : null}
             </>
           )}
         </div>

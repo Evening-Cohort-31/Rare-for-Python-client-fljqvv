@@ -35,9 +35,6 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
   // Admins can edit tags on any post.
   const canEditTags = isOwner || isAdmin;
 
-  // Authors may only remove tags.
-  const canRemoveTags = isOwner || isAdmin;
-
   // Admins may add existing tags to any post.
   const canAddTags = isAdmin;
 
@@ -47,7 +44,7 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
   return (
     <>
       <aside className="box">
-        <p className="has-text-weight-semibold mb-3">Tags</p>
+        <p className="has-text-weight-semibold mb-3 has-text-centered">Tags Associated with this Post</p>
 
         {tags.length ? (
           <div
@@ -67,7 +64,7 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
         {canEditTags ? (
           <div className="mt-4">
             <Button color="primary" onClick={() => setIsEditingTags(true)}>
-              Edit Tags
+              Manage Tags for this Post
             </Button>
           </div>
         ) : null}
@@ -78,7 +75,7 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
           post={post}
           canAddTags={canAddTags}
           canCreateTags={canCreateTags}
-          canRemoveTags={canRemoveTags}
+          canRemoveTags={canEditTags}
           onClose={() => setIsEditingTags(false)}
           onUpdated={() => {
             setIsEditingTags(false);
