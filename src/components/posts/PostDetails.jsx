@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 // useParams lets us read the :postId from the URL (e.g. /posts/5 → postId = "5")
 import { useParams, useNavigate, Link } from "react-router-dom";
 // Custom service function we created in PostService.js to fetch a single post by ID
@@ -16,8 +16,8 @@ import {
 
 import { DeletePostButton } from "../../design/DeletePostButton";
 import { ReactionBar } from "../reactions/ReactionBar.jsx";
+import { PostTagAside } from "./PostTagAside.jsx";
 
-// New component for Ticket #5 - View Post Details
 // Displays a single post's full details when a user clicks a post title from a list
 export const PostDetails = () => {
   // Extracts the postId from the URL parameter defined in ApplicationViews route
@@ -26,10 +26,16 @@ export const PostDetails = () => {
   // Holds the fetched post data; starts as null to trigger "Loading..." state
   const [post, setPost] = useState(null);
 
-  // Fetches the single post from the API when component mounts or postId changes
-  useEffect(() => {
+  // Use useCallback to memoize the fetchPost function, so it only changes if postId changes instead of on every render. 
+  // This prevents unnecessary re-fetching and avoids infinite loops in useEffect.
+  const fetchPost = useCallback(() => {
     getPostByIdExpandCategoryExpandUser(postId).then(setPost);
   }, [postId]);
+
+  // Fetches the single post from the API when component mounts or postId changes
+  useEffect(() => {
+    fetchPost();
+  }, [postId, fetchPost]);
 
   // Show loading message while waiting for API response (post is still null)
   if (!post) return <Loading />;
@@ -45,23 +51,26 @@ export const PostDetails = () => {
         <h1 className="title is-2 has-text-centered mb-4">{post.title}</h1>
 
         {/* Row above the image:
-            - Left: edit/delete icons (dead links for now)
+            - Left: edit/delete icons
             - Right: category label
         */}
         <div className="level mb-3">
           <div className="level-left">
             <div className="buttons are-small">
-              {/* "Edit post" (dead for now) */}
+              {/* "Edit post" */}
               <IconButton
                 icon="gear"
-                title="Edit post (coming soon)"
-                onClick={() => {}}
+                title="Edit post"
+                onClick={() => navigate(`/my-posts/edit/${post.id}`)}
               />
-              {/* "Delete post" (dead for now) */}
-              <IconButton
+              {/* "Delete post" */}
+              <DeletePostButton
                 icon="trash"
-                title="Delete post (coming soon)"
-                onClick={() => {}}
+                userId={post.user_id}
+                postId={post.id}
+                title="Delete post"
+                confirmTitle="Delete Post"
+                confirmMessage="Are you sure you want to delete this post? This action cannot be undone."
               />
             </div>
           </div>
@@ -75,15 +84,23 @@ export const PostDetails = () => {
         </div>
 
         {/* Only render the header image if the post has an image_url */}
-        {post.image_url ? (
-          <figure className="image mb-4">
-            <img
-              src={post.image_url}
-              alt="Post header"
-              style={{ width: "100%", borderRadius: "8px" }}
-            />
-          </figure>
-        ) : null}
+        <div className="columns is-variable is-5">
+          <div className="column is-three-quarters">
+            {post.image_url ? (
+              <figure className="image mb-4">
+                <img
+                  src={post.image_url}
+                  alt="Post header"
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
+              </figure>
+            ) : null}
+          </div>
+
+          <div className="column is-one-quarter">
+            <PostTagAside post={post} onTagsUpdated={fetchPost} />
+          </div>
+        </div>
 
         {/* Row under the image:
             - Left: author name
@@ -109,13 +126,6 @@ export const PostDetails = () => {
               >
                 View Comments
               </Button>
-              <DeletePostButton
-                userId={post.user_id}
-                postId={post.id}
-                title="Delete Post"
-                confirmTitle="Delete Post"
-                confirmMessage="Are you sure you want to delete this post? This action cannot be undone."
-              />
             </div>
           </div>
 

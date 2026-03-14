@@ -1,4 +1,5 @@
-// Reusable form component for creating and editing posts, with support for categories, tags, and image URLs.
+// Reusable form component for creating and editing posts
+// with support for categories, optional image URLs, and optional tag selection.
 import {
   Form,
   FormField,
@@ -6,7 +7,7 @@ import {
   FormSelect,
   Button,
   Card,
-} from "../../design"
+} from "../../design";
 
 export const PostForm = ({
   post,
@@ -21,7 +22,8 @@ export const PostForm = ({
   showImageUrl = false,
   showTags = false,
   tags = [],
-  onTagChange,
+  selectedTagIds = [],
+  onTagChange = () => {},
 }) => {
   return (
     <Card className="edit-form-card">
@@ -87,7 +89,7 @@ export const PostForm = ({
                   <input
                     type="checkbox"
                     value={tag.id}
-                    checked={post.tag_ids?.includes(tag.id)}
+                    checked={selectedTagIds?.includes(tag.id)}
                     onChange={onTagChange}
                   />{" "}
                   {tag.label}
@@ -97,9 +99,11 @@ export const PostForm = ({
           </div>
         ) : null}
 
-        {submitError ? <p className="has-text-danger mb-4">{submitError}</p> : null}
+        {submitError ? (
+          <p className="has-text-danger mb-4">{submitError}</p>
+        ) : null}
 
-        <div className="is-flex is-justify-content-flex-end is-gap-3">
+        <div className="is-flex is-justify-content-flex-end" style={{ gap: "0.75rem" }}>
           <Button type="button" className="is-light" onClick={onCancel}>
             {cancelLabel}
           </Button>
@@ -110,5 +114,5 @@ export const PostForm = ({
         </div>
       </Form>
     </Card>
-  )
-}
+  );
+};

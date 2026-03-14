@@ -70,3 +70,10 @@ export {
   updateDemotionQueueEntry,
   deleteDemotionQueueEntry,
 } from "./DemotionQueue.js";
+
+// PostTags 
+export {
+  getTagsByPostId,
+  addTagToPost,
+  removeTagFromPost,
+} from "./PostTagsService.js";
