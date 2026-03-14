@@ -42,7 +42,7 @@ export const ConfirmDialog = ({
 
         <div className="modal-card">
           <header className="modal-card-head">
-            <p className="modal-card-title">{title}</p>
+            <p className="modal-card-title" style={{ minWidth: 0, flexShrink: 1, wordBreak: "break-word" }}>{title}</p>
             <button
               type="button"
               className="delete"
@@ -52,7 +52,7 @@ export const ConfirmDialog = ({
           </header>
 
           <section className="modal-card-body">
-            <p>{message}</p>
+            <div>{message}</div>
           </section>
 
           <footer className="modal-card-foot">

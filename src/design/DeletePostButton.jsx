@@ -24,7 +24,7 @@ export const DeletePostButton = ({
   const dialogRef = useRef(null)
 
   if (isLoading || !currentUser) return null
-  if (currentUser.id !== userId) return null
+  if (currentUser.id !== userId && !currentUser.is_staff) return null
 
   const openDialog = () => {
     // <dialog> must be opened via showModal()
