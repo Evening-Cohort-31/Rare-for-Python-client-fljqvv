@@ -26,6 +26,8 @@ export const PostDetails = () => {
   // Holds the fetched post data; starts as null to trigger "Loading..." state
   const [post, setPost] = useState(null);
 
+  // Use useCallback to memoize the fetchPost function, so it only changes if postId changes instead of on every render. 
+  // This prevents unnecessary re-fetching and avoids infinite loops in useEffect.
   const fetchPost = useCallback(() => {
     getPostByIdExpandCategoryExpandUser(postId).then(setPost);
   }, [postId]);

@@ -27,6 +27,9 @@ export const EditPostTagsDialog = ({
   const [notification, setNotification] = useState("");
   const [notificationIsError, setNotificationIsError] = useState(false);
 
+  // Load both the tags currently attached to this post and all available tags in the system.
+  // This allows us to show current tags with remove buttons and also provide a dropdown of available tags to add.
+  // We use useCallback to memoize this function so that it doesn't get re-created on every render, which would cause the useEffect that depends on it to run more often than necessary.
   const loadDialogData = useCallback(async () => {
     if (!post?.id) return;
 
@@ -73,6 +76,7 @@ export const EditPostTagsDialog = ({
     return allTags.filter((tag) => !attachedTagIds.has(tag.id));
   }, [allTags, attachedTagIds]);
 
+  // Handlers for adding/removing tags, creating new tags, and closing the dialog.
   const handleRemoveTag = async (postTagId) => {
     if (!canRemoveTags) return;
 
@@ -96,6 +100,7 @@ export const EditPostTagsDialog = ({
     }
   };
 
+  // Handler for adding an existing tag to the post. This is only allowed if the user has permission to add tags and has selected a tag from the dropdown.
   const handleAddExistingTag = async () => {
     if (!canAddTags || !selectedTagId) return;
 
@@ -122,6 +127,8 @@ export const EditPostTagsDialog = ({
     }
   };
 
+  // Handler for creating a new tag and adding it to the post. 
+  // Only admins can create new tags.
   const handleCreateAndAddTag = async () => {
     if (!canCreateTags || !newTagLabel.trim()) return;
 
@@ -186,6 +193,7 @@ export const EditPostTagsDialog = ({
               <div className="mb-4">
                 <p className="has-text-weight-semibold mb-2">Current Tags</p>
 
+                {/* Show the tags currently attached to this post, with a "Remove" button if the user has permission to remove tags. */}
                 {postTags.length ? (
                   <div
                     className="is-flex is-flex-direction-column"
@@ -221,6 +229,7 @@ export const EditPostTagsDialog = ({
                 )}
               </div>
 
+                {/* If the user has permission to add tags, show the UI for adding an existing tag. This includes a dropdown of available tags that are not already attached to the post and an "Add" button. */}
               {canAddTags ? (
                 <div className="mb-4">
                   <p className="has-text-weight-semibold mb-2">
@@ -264,6 +273,7 @@ export const EditPostTagsDialog = ({
                 </div>
               ) : null}
 
+              {/* Only admins can create new tags on the fly. */}
               {canCreateTags ? (
                 <div className="mb-3">
                   <p className="has-text-weight-semibold mb-2">

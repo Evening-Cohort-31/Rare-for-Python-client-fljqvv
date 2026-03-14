@@ -9,8 +9,10 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
   const [isEditingTags, setIsEditingTags] = useState(false);
   const [tags, setTags] = useState([]);
 
+  // Grab the postId from the post prop for easier use in API calls
   const postId = post?.id;
 
+  // Use useCallback to memoize the fetchTags function, so it only changes if postId changes instead of on every render.
   const fetchTags = useCallback(() => {
     if (!postId) return;
 
@@ -28,6 +30,7 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
     fetchTags();
   }, [fetchTags]);
 
+  // Determine permissions based on current user and post ownership
   const isOwner = currentUser?.id === post?.user_id;
   const isAdmin = currentUser?.is_staff === true;
 
@@ -35,10 +38,12 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
   // Admins can edit tags on any post.
   const canEditTags = isOwner || isAdmin;
 
+  // Authors may add existing tags to their own posts.
   // Admins may add existing tags to any post.
-  const canAddTags = isAdmin;
+  const canAddTags = isOwner || isAdmin;
 
-  // Admins may create a new tag and add it to any post.
+  // Admins may create a new tag and add it to any post on the fly. 
+  // Authors cannot create new tags.
   const canCreateTags = isAdmin;
 
   return (
@@ -61,6 +66,8 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
           <p className="is-size-7 has-text-grey mb-3">No tags assigned.</p>
         )}
 
+        {/* Only show the "Manage Tags" button if the user has permission to edit tags 
+        which is just authors of the post or admins */}
         {canEditTags ? (
           <div className="mt-4">
             <Button color="primary" onClick={() => setIsEditingTags(true)}>
@@ -70,6 +77,8 @@ export const PostTagAside = ({ post, onTagsUpdated }) => {
         ) : null}
       </aside>
 
+      {/* Render the EditPostTagsDialog modal while isEditingTags is true.
+      We pass down the post, permissions, and callbacks to handle closing and updating tags. */}
       {isEditingTags ? (
         <EditPostTagsDialog
           post={post}
