@@ -8,6 +8,7 @@ import { FilterBar } from "../posts/FilterBar.jsx";
 import { Loading, PageHeader, Container, Button } from "../../design";
 import { PostCard } from "./PostCard.jsx";
 
+
 export const AllPosts = () => {
   const { currentUser } = useCurrentUser();
   const [posts, setPosts] = useState([]);
@@ -34,6 +35,11 @@ export const AllPosts = () => {
     }
   };
 
+  const visiblePosts = currentUser?.is_staff 
+      ? posts
+      : posts.filter(post => post.approved);
+
+
   if (loading) {
     return <Loading />;
   }
@@ -42,7 +48,7 @@ export const AllPosts = () => {
   // It starts with ALL posts, then narrows them down if the user has typed something
   const getFilteredPost = () => {
     // Start with the full list of posts from state
-    let filtered = posts;
+    let filtered = visiblePosts;
 
     // Only filter if the user actually typed something (empty string = show everything)
     if (searchTerm) {
@@ -61,6 +67,7 @@ export const AllPosts = () => {
   return (
     <Container>
       <PageHeader title="All Posts" centered />
+      <div className="is-flex" style={{gap: `1rem`}}>
       <Button className="is-link mb-5" onClick={() => navigate("/posts/new")}>
         New Post
       </Button>
@@ -69,16 +76,15 @@ export const AllPosts = () => {
         setInputValue={setInputValue}
         onSearch={handleSearch}
       />
+      </div>
       <div className="columns is-multiline">
-        {/* CHANGED (search_post_title ticket): Was posts.map — now calls getFilteredPost() first so only matching posts are shown */}
         {getFilteredPost().map((post) => (
           <div className="column is-half" key={post.id}>
-            <PostCard
-              post={post}
-              currentUser={currentUser}
-              showEdit={true}
-              showReactions={true}
-            />
+            <PostCard 
+            post={post} 
+            currentUser={currentUser} 
+            showEdit={true} 
+            showReactions={true} />
           </div>
         ))}
       </div>

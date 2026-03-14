@@ -1,7 +1,8 @@
 // Reusable card component for displaying post summaries, with optional edit button and reaction bar.
 import { useNavigate, Link } from "react-router-dom"
-import { Card, Button } from "../../design"
+import { Card, IconButton } from "../../design"
 import { ReactionBar } from "../reactions/ReactionBar"
+import { ApprovePostButton } from "./ApprovePostButton"
 
 export const PostCard = ({
   post,
@@ -60,26 +61,36 @@ export const PostCard = ({
             Read More →
           </Link>
 
-          {showEdit && isOwner ? (
-            <div className="buttons mb-0">
-              <Button
-                className="is-outlined"
-                onClick={() => navigate(`/my-posts/edit/${post.id}`)}
-              >
-                Edit Post
-              </Button>
-            </div>
-          ) : null}
+          
         </div>
-
+        <div className="is-flex is-justify-content-space-between is-flex-wrap-wrap mt-auto">
         {showReactions ? (
           <>
-            <hr className="my-4" />
-            <div>
+            <div className="is-flex is-justify-content-space-between is-align-items-center mt-auto pt-4">
               <ReactionBar postId={post.id} />
             </div>
           </>
         ) : null}
+        <div className="is-flex is-align-items-center" style={{ gap: '0.5rem' }}> 
+        {currentUser.is_staff ? (
+          <>
+            <div>
+            <ApprovePostButton
+              
+                post={post}/>
+            </div>
+          </>
+        ) : null}
+        {showEdit && isOwner ? (
+            
+              <IconButton
+                icon="gear"
+                title="Edit post"
+                onClick={() => navigate(`/my-posts/edit/${post.id}`)} /> 
+           
+          ) : null}
+          </div> 
+        </div>     
       </div>
     </Card>
   )

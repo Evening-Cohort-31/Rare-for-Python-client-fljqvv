@@ -1,4 +1,4 @@
-import { Button, Card, Container, Loading } from "../../design";
+import { Card, Container, Loading } from "../../design";
 import { Link, useParams } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { getUserById } from "../../services";

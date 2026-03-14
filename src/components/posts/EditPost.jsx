@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom"
 import { Container, PageHeader, Loading } from "../../design"
 import { PostForm } from "./PostForm"
 
+
 export const EditPost = () => {
   const { postId } = useParams()
   const { currentUser } = useCurrentUser()
@@ -13,6 +14,7 @@ export const EditPost = () => {
   const [loading, setLoading] = useState(true)
   const [submitError, setSubmitError] = useState("")
   const navigate = useNavigate()
+
 
   useEffect(() => {
     if (!currentUser) return

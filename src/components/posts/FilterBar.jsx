@@ -1,7 +1,8 @@
 export const FilterBar = ({ inputValue, setInputValue, onSearch }) => {
   return (
-    <div className="filter-bar">
+    <div className="control">
       <input
+        className="input mb-5" style={{width: `550px`}}
         type="text"
         placeholder="Search by title..."
         value={inputValue}
