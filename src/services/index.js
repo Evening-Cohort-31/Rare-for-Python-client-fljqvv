@@ -60,3 +60,13 @@ export {
 
 // Images/Avatars
 export { getAvatars, uploadFile, uploadProfileImage, getPreviouslyUploadedImages } from "./ImageService.js";
+
+// Demotion Queue
+export {
+  getAllDemotionQueueEntries,
+  getPendingDemotionQueueByTargetId,
+  getPendingDemotionQueueByInitiatorId,
+  createDemotionQueueEntry,
+  updateDemotionQueueEntry,
+  deleteDemotionQueueEntry,
+} from "./DemotionQueue.js";

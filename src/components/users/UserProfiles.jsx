@@ -1,212 +1,377 @@
 // Component for displaying all user profiles.
-import { useEffect, useState, useRef } from "react"
-import { useNavigate, Link } from "react-router-dom"
-import { getAllUsers, getInactiveUsers, getActiveUsers, updateUser } from "../../services/index.js"
-import { Loading, PageHeader, Container, Card, ConfirmDialog, Button} from "../../design"
-import { useCurrentUser } from "../../context/CurrentUserContext.js"
-import "./UserProfiles.css"
+// This component is only accessible to staff users and allows them to view all users, filter by active/inactive/authors/admins, activate/deactivate users, and change user roles between author and admin. It also implements a demotion queue system for demoting admins, which requires two admin approvals to complete the demotion. The component uses various API calls to fetch users, update user status and roles, and manage the demotion queue. It also includes confirmation dialogs for critical actions and notifications for success/error messages.
+// Comments have been added throughout the code to explain the purpose and functionality of each part, especially around the complex logic for handling role changes and the demotion queue. The code is structured with React hooks for state management and side effects, and it uses a combination of custom components for the UI.
+import { useEffect, useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  getAllUsers,
+  updateUser,
+  getPendingDemotionQueueByInitiatorId,
+  getPendingDemotionQueueByTargetId,
+  createDemotionQueueEntry,
+  updateDemotionQueueEntry,
+  deleteDemotionQueueEntry,
+} from "../../services/index.js";
+import {
+  Loading,
+  PageHeader,
+  Container,
+  ConfirmDialog,
+  Notification,
+} from "../../design";
+import { useCurrentUser } from "../../context/CurrentUserContext.js";
+import { UserFilterButtons } from "./UserFilterButtons.jsx";
+import { UserTable } from "./UserTable.jsx";
+import { ChangeUserTypeModal } from "./ChangeUserTypeModal.jsx";
+import "./UserProfiles.css";
 
 export const UserProfiles = () => {
-  const [users, setUsers] = useState([])
-  const [activeFilter, setActiveFilter] = useState("all")
-  const [loading, setLoading] = useState(true)
+  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
+  const [activeFilter, setActiveFilter] = useState("all");
+  const [notification, setNotification] = useState("");
+  const roleDialogRef = useRef();
+  const [selectedRoleUser, setSelectedRoleUser] = useState(null);
+  const [selectedUserType, setSelectedUserType] = useState("");
+  const [roleSubmitError, setRoleSubmitError] = useState("");
+  const [pendingDemotionRequests, setPendingDemotionRequests] = useState([]);
+  const [selectedDemotionRequest, setSelectedDemotionRequest] = useState(null);
+  const cancelDemotionDialogRef = useRef();
+  const [loading, setLoading] = useState(true);
 
-  // State to trigger re-fetching users after toggling active status
-  // This refreshKey state is used to trigger the useEffect hook to re-fetch the user list whenever a user's active status is toggled. 
-  // By incrementing this key, we can ensure that the latest user data is loaded without having to directly manipulate the users state after an update.
-  const [refreshKey, setRefreshKey] = useState(0)
+  // Incrementing this triggers the useEffect to re-fetch users after an update.
+  const [refreshKey, setRefreshKey] = useState(0);
 
-  const navigate = useNavigate()
-
-  const { currentUser } = useCurrentUser()
-  // Ref for the confirmation dialog
-  // useRef hook is used to get a reference to the ConfirmDialog component, allowing us to programmatically control its visibility and content when toggling user active status.
-  const dialogRef = useRef()
-
-  const [selectedUser, setSelectedUser] = useState(null)
+  const navigate = useNavigate();
+  const { currentUser } = useCurrentUser();
+  const dialogRef = useRef();
+  const [selectedUser, setSelectedUser] = useState(null);
 
   useEffect(() => {
-      let isMounted = true
+    let isMounted = true;
 
-      const loadUsers = async () => {
-            setLoading(true)
-            try {
-                let usersData
-                if (activeFilter === "active") {
-                    usersData = await getActiveUsers()
-                } else if (activeFilter === "inactive") {
-                    usersData = await getInactiveUsers()
-                } else {
-                    usersData = await getAllUsers()
-                }
+    const loadUsers = async () => {
+      setLoading(true);
+      try {
+        const allUsersData = await getAllUsers();
+        let usersData;
+        const pendingRequests = await getPendingDemotionQueueByInitiatorId(
+          currentUser.id,
+        );
 
-                if (isMounted) {
-                    setUsers(usersData.map((u) => ({ ...u, active: Boolean(u.active) })))
-                }
-            } finally {
-                if (isMounted) {
-                    setLoading(false)
-                }
-            }
+        if (activeFilter === "active") {
+          usersData = allUsersData.filter((u) => u.active);
+        } else if (activeFilter === "inactive") {
+          usersData = allUsersData.filter((u) => !u.active);
+        } else if (activeFilter === "authors") {
+          usersData = allUsersData.filter((u) => !u.is_staff);
+        } else if (activeFilter === "admins") {
+          usersData = allUsersData.filter((u) => u.is_staff);
+        } else {
+          usersData = allUsersData;
+        }
+
+        if (isMounted) {
+          setAllUsers(
+            allUsersData.map((u) => ({ ...u, active: Boolean(u.active) })),
+          );
+          setPendingDemotionRequests(pendingRequests);
+          setUsers(usersData.map((u) => ({ ...u, active: Boolean(u.active) })));
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
       }
+    };
 
-      loadUsers()
+    loadUsers();
 
-      return () => {
-            isMounted = false
-      }
-  }, [activeFilter, refreshKey])
+    return () => {
+      isMounted = false;
+    };
+  }, [activeFilter, refreshKey, currentUser.id]);
 
-  // Handler for toggling user active status - opens confirmation dialog
+  // Handle activate/deactivate user. Shows confirmation dialog first, then calls API to update user status if confirmed.
   const handleToggleActive = (user) => {
-    setSelectedUser(user)
-    dialogRef.current.showModal()
-  }
+    setSelectedUser(user);
+    dialogRef.current.showModal();
+  };
 
-// Handler for confirming active status toggle - updates user and refreshes list by incrementing refreshKey
- const handleConfirmToggle = async () => {
-  if (!selectedUser) return
+  // After confirming activate/deactivate, call API to update user and refresh list. Also handles errors.
+  const handleConfirmToggle = async () => {
+    if (!selectedUser) return;
 
-  const newActiveStatus = !selectedUser.active
+    try {
+      await updateUser(selectedUser.id, {
+        ...selectedUser,
+        active: !selectedUser.active,
+      });
+      setSelectedUser(null);
+      setRefreshKey((prev) => prev + 1);
+    } catch (error) {
+      console.error("Failed to update user:", error);
+    }
+  };
 
-  await updateUser(selectedUser.id, { ...selectedUser, active: newActiveStatus })
+  // Cancel activate/deactivate action, just close dialog and reset selected user.
+  const handleCancelToggle = () => {
+    setSelectedUser(null);
+  };
 
-  setSelectedUser(null)
-  setRefreshKey((prev) => prev + 1)
-}
+  // Handle change role button click. Shows change role modal with current role pre-selected.
+  const handleCancelRoleChange = () => {
+    setSelectedRoleUser(null);
+    setSelectedUserType("");
+    setRoleSubmitError("");
+  };
 
-// Handler for canceling active status toggle - simply closes the confirmation dialog without making changes
-const handleCancelToggle = () => {
-  setSelectedUser(null)
-}
+  // Handle click on "Cancel Demotion Request" button in the UI. This allows an admin to cancel their own pending demotion request for a user, which will remove the request from the queue and prevent the demotion from being approved by another admin.
+  const handleRequestCancelDemotion = (queueEntry) => {
+    setSelectedDemotionRequest(queueEntry);
+    cancelDemotionDialogRef.current?.showModal();
+  };
 
-// Access control: only staff users can view this page
-// Redirects non-staff users to an access denied page.
-if (!currentUser || !currentUser.is_staff) {
-    navigate("/access-denied", { replace: true })
-    return null
+  //only change role if not changing own role and if not demoting last admin
+  //if demoting admin, add to demotion queue and it requires two admin approvals to be fully demoted.
+  // If the target user is already in the demotion queue, update demotion queue with approver_id and status = "approved" then update the user info with new role.
+  // If the target user is not in the demotion queue, create a new entry with initiator_id, target_admin_id, and status = "pending".
+  const handleChangeRole = (user) => {
+    setNotification("");
+    setRoleSubmitError("");
+
+    // Get the current count of admin users to enforce the rule that there must always be at least one admin.
+    const adminCount = allUsers.filter((u) => u.is_staff).length;
+
+    // Prevent changing own role to avoid accidentally locking oneself out of admin privileges.
+    if (user.id === currentUser.id) {
+      setNotification("You cannot change your own user type.");
+      return;
+    }
+
+    // If demoting an admin, check if they are the last admin. If so, prevent the action and show a notification.
+    if (user.is_staff && adminCount === 1) {
+      setNotification(
+        "This is the last Admin. Please promote another user to Admin before demoting this user.",
+      );
+      return;
+    }
+
+    // Open the change role modal and set the selected user and their current role (admin or author).
+    setSelectedRoleUser(user);
+    setSelectedUserType(user.is_staff ? "admin" : "author");
+    roleDialogRef.current?.showModal();
+  };
+
+  // After confirming role change, this function handles the logic for promoting an author to admin immediately
+  // For demoting an admin, it requires checking the demotion queue and potentially adding to it.
+  // It also handles error cases and updates the UI with notifications.
+  const handleConfirmRoleChange = async () => {
+    if (!selectedRoleUser) return;
+
+    setRoleSubmitError("");
+    setNotification("");
+
+    // Get the current count of admin users to enforce the rule that there must always be at least one admin.
+    const adminCount = allUsers.filter((u) => u.is_staff).length;
+    // Check if the action is demoting an admin to author, which has special rules around the demotion queue and requires two admin approvals.
+    const isDemotingAdmin =
+      selectedRoleUser.is_staff && selectedUserType === "author";
+
+    // Prevent changing own role to avoid accidentally locking oneself out of admin privileges.
+    if (selectedRoleUser.id === currentUser.id) {
+      setRoleSubmitError("You cannot change your own user type.");
+      return;
+    }
+
+    // If demoting an admin, check if they are the last admin. If so, prevent the action and show an error message.
+    if (isDemotingAdmin && adminCount === 1) {
+      setRoleSubmitError(
+        "This is the last Admin. Please promote another user to Admin before demoting this user.",
+      );
+      return;
+    }
+
+    // Try block to handle the asynchronous API calls for updating user roles and managing the demotion queue.
+    // This includes error handling to show appropriate messages if something goes wrong.
+    try {
+      // If demoting an admin, we need to check the demotion queue to see if there is already a pending entry for this user.
+      if (isDemotingAdmin) {
+        const pendingEntries = await getPendingDemotionQueueByTargetId(
+          selectedRoleUser.id,
+        );
+
+        // If there is a pending entry, it means another admin has already initiated a demotion request for this user.
+        // We need to check if the current user is the initiator of that request. If so, we cannot approve it ourselves and must show an error message.
+        // If the current user is not the initiator, then we can approve the pending request, which will update the queue entry and then update the user's role to complete the demotion.
+        if (pendingEntries && pendingEntries.length > 0) {
+          const pendingEntry = pendingEntries[0];
+
+          if (pendingEntry.initiator_id === currentUser.id) {
+            setRoleSubmitError(
+              "You already submitted this demotion request. A different admin must approve it.",
+            );
+            return;
+          }
+
+          // Second admin approval: approve queue entry, then demote user
+          await updateDemotionQueueEntry(pendingEntry.id, {
+            ...pendingEntry,
+            approver_id: currentUser.id,
+            status: "approved",
+          });
+
+          // Now that the demotion request has been approved by a second admin, update the user's role to complete the demotion.
+          await updateUser(selectedRoleUser.id, {
+            ...selectedRoleUser,
+            is_staff: false,
+          });
+
+          setNotification(
+            `Demotion approved. ${selectedRoleUser.first_name} ${selectedRoleUser.last_name} has been changed from Admin to Author.`,
+          );
+        } else {
+          // First admin request: queue only, no role change yet
+          await createDemotionQueueEntry({
+            action: "demote_admin",
+            target_admin_id: selectedRoleUser.id,
+            initiator_id: currentUser.id,
+            status: "pending",
+          });
+
+          setNotification(
+            `Demotion for ${selectedRoleUser.first_name} ${selectedRoleUser.last_name} was added to the queue. A second Admin is required to complete it.`,
+          );
+        }
+      } else {
+        // Promote Author -> Admin immediately
+        await updateUser(selectedRoleUser.id, {
+          ...selectedRoleUser,
+          is_staff: selectedUserType === "admin",
+        });
+
+        setNotification(
+          `${selectedRoleUser.first_name} ${selectedRoleUser.last_name} has been promoted to Admin.`,
+        );
+      }
+
+      setSelectedRoleUser(null);
+      setSelectedUserType("");
+      setRefreshKey((prev) => prev + 1);
+
+      if (roleDialogRef.current?.open) {
+        roleDialogRef.current.close();
+      }
+    } catch (error) {
+      console.error("Failed to update user role:", error);
+      setRoleSubmitError("Failed to update user role. Please try again.");
+    }
+  };
+
+  // Handle confirming the cancellation of a pending demotion request. This will call the API to delete the demotion queue entry, which effectively cancels the request and prevents it from being approved by another admin.
+  const handleConfirmCancelDemotion = async () => {
+    if (!selectedDemotionRequest || !currentUser) return;
+
+    try {
+      await deleteDemotionQueueEntry(
+        selectedDemotionRequest.id,
+        currentUser.id,
+      );
+
+      setNotification("Pending demotion request canceled.");
+      setSelectedDemotionRequest(null);
+      setRefreshKey((prev) => prev + 1);
+
+      if (cancelDemotionDialogRef.current?.open) {
+        cancelDemotionDialogRef.current.close();
+      }
+    } catch (error) {
+      console.error("Failed to cancel demotion request:", error);
+      setNotification("Failed to cancel demotion request. Please try again.");
+    }
+  };
+
+  // Handle canceling the cancellation of a pending demotion request, which just closes the confirmation dialog and resets the selected demotion request state.
+  const handleCancelDemotionDialog = () => {
+    setSelectedDemotionRequest(null);
+  };
+
+  // Access control: only staff users can view this page
+  if (!currentUser || !currentUser.is_staff) {
+    navigate("/access-denied", { replace: true });
+    return null;
   }
 
   if (loading) {
-    return <Loading />
+    return <Loading />;
   }
 
   return (
-  <Container>
-  <PageHeader title="Users" centered />
+    <Container>
+      <PageHeader title="Users" centered />
 
-  {/* Top Filter buttons */}
-  <div className="level-item">
-    <div className="buttons">
-      <Button
-        color="info"
-        variant={activeFilter === "all" ? "outlined" : undefined}
-        onClick={() => setActiveFilter("all")}
-      >
-        All Users
-      </Button>
-      <Button
-        color="info"
-        variant={activeFilter === "active" ? "outlined" : undefined}
-        onClick={() => setActiveFilter("active")}
-      >
-        Active Users
-      </Button>
-      <Button
-        color="info"
-        variant={activeFilter === "inactive" ? "outlined" : undefined}
-        onClick={() => setActiveFilter("inactive")}
-      >
-        Inactive Users
-      </Button>
-    </div>
-  </div>
+      {notification ? (
+        <div className="mb-4">
+          <Notification
+            type="warning"
+            message={notification}
+            onClose={() => setNotification("")}
+          />
+        </div>
+      ) : null}
 
-  {/* Table */}
-  <Card>
-    <div className="table-container">
-      <table className="table is-fullwidth is-striped is-hoverable">
-        <thead>
-          <tr>
-            <th>Username</th>
-            <th>Name</th>
-            <th>Active Status</th>
-            <th>Author or Admin</th>
-          </tr>
-        </thead>
+      <UserFilterButtons
+        activeFilter={activeFilter}
+        onFilterChange={setActiveFilter}
+      />
 
-        <tbody>
-          {users.map((user) => (
-            <tr key={user.id}>
-              {/* Username */}
-              <td><Link to={`/users/${user.id}`}>{user.username}</Link></td>
+      <UserTable
+        users={users}
+        currentUser={currentUser}
+        pendingDemotionRequests={pendingDemotionRequests}
+        onToggleActive={handleToggleActive}
+        onChangeRole={handleChangeRole}
+        onCancelDemotionRequest={handleRequestCancelDemotion}
+      />
 
-              {/* User Name */}
-              <td>
-                {user.first_name} {user.last_name}
-              </td>
+      <ConfirmDialog
+        dialogRef={dialogRef}
+        title={selectedUser?.active ? "Deactivate User" : "Activate User"}
+        message={
+          selectedUser?.active
+            ? `Are you sure you want to deactivate ${selectedUser?.first_name} ${selectedUser?.last_name} (${selectedUser?.username})?`
+            : `Are you sure you want to activate ${selectedUser?.first_name} ${selectedUser?.last_name} (${selectedUser?.username})?`
+        }
+        confirmText={selectedUser?.active ? "Yes, Deactivate" : "Yes, Activate"}
+        confirmColor={selectedUser?.active ? "is-danger" : "is-success"}
+        onConfirm={handleConfirmToggle}
+        onCancel={handleCancelToggle}
+      />
 
-              {/* Active Status: checkbox + action button */}
-              <td>
-                <div className="is-flex is-align-items-center" style={{ gap: "0.75rem" }}>
-                  <label className="checkbox">
-                    <input
-                      type="checkbox"
-                      checked={!!user.active}
-                      onChange={(e) => {
-                        // prevent the checkbox from visually toggling before confirmation
-                        e.preventDefault()
-                        handleToggleActive(user)
-                      }}
-                    />
-                    <span style={{ marginLeft: "0.5rem" }}>
-                      {user.active ? "Active" : "Inactive"}
-                    </span>
-                  </label>
-                  
-                  {/* Action button to toggle active status - shows "Deactivate" for active users and "Activate" for inactive users */}
-                  {user.active ? (
-                    <Button
-                      color="danger"
-                      size="small"
-                      onClick={() => handleToggleActive(user)}
-                    >
-                      Deactivate
-                    </Button>
-                  ) : (
-                    <Button
-                      color="success"
-                      size="small"
-                      onClick={() => handleToggleActive(user)}
-                    >
-                      Activate
-                    </Button>
-                  )}
-                </div>
-              </td>
+      <ChangeUserTypeModal
+        dialogRef={roleDialogRef}
+        selectedRoleUser={selectedRoleUser}
+        selectedUserType={selectedUserType}
+        onUserTypeChange={setSelectedUserType}
+        onConfirm={handleConfirmRoleChange}
+        onCancel={handleCancelRoleChange}
+        roleSubmitError={roleSubmitError}
+        onClearError={() => setRoleSubmitError("")}
+      />
 
-              {/* Role */}
-              <td>{user.is_staff ? "Admin" : "Author"}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  </Card>
-
-  <ConfirmDialog
-    dialogRef={dialogRef}
-    title={selectedUser?.active ? "Deactivate User" : "Activate User"}
-    message={
-      selectedUser?.active
-        ? `Are you sure you want to deactivate ${selectedUser?.first_name} ${selectedUser?.last_name} (${selectedUser?.username})?`
-        : `Are you sure you want to activate ${selectedUser?.first_name} ${selectedUser?.last_name} (${selectedUser?.username})?`
-    }
-    confirmText={selectedUser?.active ? "Yes, Deactivate" : "Yes, Activate"}
-    confirmColor={selectedUser?.active ? "is-danger" : "is-success"}
-    onConfirm={handleConfirmToggle}
-    onCancel={handleCancelToggle}
-  />
-</Container>
-)
-}
+      <ConfirmDialog
+        dialogRef={cancelDemotionDialogRef}
+        title="Cancel Demotion Request"
+        message={
+          selectedDemotionRequest
+            ? "Are you sure you want to cancel this pending demotion request?"
+            : ""
+        }
+        confirmText="Yes, Cancel Request"
+        confirmColor="is-danger"
+        onConfirm={handleConfirmCancelDemotion}
+        onCancel={handleCancelDemotionDialog}
+      />
+    </Container>
+  );
+};

@@ -14,7 +14,7 @@ export const ApprovePostButton = ({ post }) => {
 
     return (
        
-        <label className="radio box button" style={{ cursor: "pointer" }}>
+        <label className="radio button" style={{ cursor: "pointer" }}>
             <input
                 type="radio"
                 checked={!!isApproved}
