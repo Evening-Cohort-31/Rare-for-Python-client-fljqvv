@@ -67,6 +67,7 @@ export const AllPosts = () => {
   return (
     <Container>
       <PageHeader title="All Posts" centered />
+      <div className="is-flex" style={{gap: `1rem`}}>
       <Button className="is-link mb-5" onClick={() => navigate("/posts/new")}>
         New Post
       </Button>
@@ -75,6 +76,7 @@ export const AllPosts = () => {
         setInputValue={setInputValue}
         onSearch={handleSearch}
       />
+      </div>
       <div className="columns is-multiline">
         {getFilteredPost().map((post) => (
           <div className="column is-half" key={post.id}>
