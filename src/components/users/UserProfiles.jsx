@@ -93,7 +93,17 @@ export const UserProfiles = () => {
   }, [activeFilter, refreshKey, currentUser.id]);
 
   // Handle activate/deactivate user. Shows confirmation dialog first, then calls API to update user status if confirmed.
+  // Blocks deactivation if the user is the last admin.
   const handleToggleActive = (user) => {
+    if (user.active && user.is_staff) {
+      const adminCount = allUsers.filter((u) => u.is_staff).length;
+      if (adminCount === 1) {
+        setNotification(
+          "You cannot deactivate the last admin. Please promote another user to Admin before making the last admin inactive.",
+        );
+        return;
+      }
+    }
     setSelectedUser(user);
     dialogRef.current.showModal();
   };

@@ -2,6 +2,7 @@ import { useRef } from "react"
 import { Link } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
 import { registerUser } from "../../managers/AuthManager"
+import { getAllUsers } from "../../services/index.js"
 
 export const Register = ({setToken}) => {
   const firstName = useRef()
@@ -14,17 +15,21 @@ export const Register = ({setToken}) => {
   const passwordDialog = useRef()
   const navigate = useNavigate()
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault()
-    
+
     if (password.current.value === verifyPassword.current.value) {
+      const existingUsers = await getAllUsers()
+      const isFirstUser = existingUsers.length === 0
+
       const newUser = {
         username: username.current.value,
         first_name: firstName.current.value,
         last_name: lastName.current.value,
         email: email.current.value,
         password: password.current.value,
-        bio: bio.current.value
+        bio: bio.current.value,
+        is_staff: isFirstUser
       }
 
       registerUser(newUser)
