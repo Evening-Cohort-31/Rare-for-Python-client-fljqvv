@@ -1,0 +1,44 @@
+.user-row {
+  display: flex;
+  align-items: stretch;
+}
+
+.user-cell {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-cell--sm {
+  flex: 0 0 160px;
+  justify-content: center;
+}
+
+.user-cell--md {
+  flex: 0 0 220px;
+}
+
+.user-divider {
+  width: 1px;
+  background: #dbdbdb;
+}
+
+.role-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.user-role-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.user-role-tag {
+  min-width: 70px;
+  justify-content: center;
+}

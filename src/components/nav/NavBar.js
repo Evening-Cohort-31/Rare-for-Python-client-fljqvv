@@ -1,5 +1,6 @@
 import { useRef } from "react"
 import { Link, useNavigate } from "react-router-dom"
+import { useCurrentUser } from "../../context/CurrentUserContext"
 import "./NavBar.css"
 import Logo from "./rare.jpeg"
 
@@ -7,6 +8,7 @@ export const NavBar = ({ token, setToken }) => {
   const navigate = useNavigate()
   const navbar = useRef()
   const hamburger = useRef()
+  const { currentUser, setCurrentUser } = useCurrentUser()
 
   const showMobileNavbar = () => {
     hamburger.current.classList.toggle('is-active')
@@ -33,7 +35,28 @@ export const NavBar = ({ token, setToken }) => {
           {
             token
               ?
-              <Link to="/" className="navbar-item">Posts</Link>
+              <>
+                {/* Non-staff user links */}
+                <Link to="/my-posts" className="navbar-item">My Posts</Link>
+                <Link to="/all-posts" className="navbar-item">All Posts</Link>
+                {/* <Link to="/bulma-sampler" className="navbar-item">Bulma Sampler</Link> */}
+                {currentUser?.id && (
+                  <Link to={`/users/${currentUser.id}`} className="navbar-item">My Profile</Link>
+                )}
+                {/* add additional non-staff links here */}
+
+                {/* Staff-only links */}
+                {currentUser?.is_staff && (
+                  <>
+                    <Link to="/categories" className="navbar-item">Category Management</Link>
+                    <Link to="/users" className="navbar-item">
+                      User Profiles
+                    </Link>
+                    <Link to="/tags" className="navbar-item">Tag Manager</Link>
+                    {/* Add more staff-only links here */}
+                  </>
+                )}
+              </>
               :
               ""
           }
@@ -47,6 +70,8 @@ export const NavBar = ({ token, setToken }) => {
                   ?
                   <button className="button is-outlined" onClick={() => {
                     setToken('')
+                    localStorage.removeItem('auth_token')
+                    setCurrentUser(null)
                     navigate('/login')
                   }}>Logout</button>
                   :

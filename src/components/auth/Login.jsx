@@ -1,14 +1,29 @@
 import { useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 import { loginUser } from "../../managers/AuthManager"
+import { getUserById } from "../../services"
+import { QuickLogin } from "./QuickLogin"
+import { useCurrentUser } from "../../context/CurrentUserContext"
 
 export const Login = ({ setToken }) => {
+
+// useRef is a React hook that creates a persistent reference to a DOM element.
+// Unlike useState, changing a ref does NOT trigger a re-render.
+//
+// Here we use refs to directly access the username and password input fields.
+// This allows us to read their values when the form is submitted:
+//
+// username.current.value
+// password.current.value
+//
+// This is more efficient than using state for simple form inputs like login forms.
   const username = useRef()
   const password = useRef()
   const navigate = useNavigate()
   const [isUnsuccessful, setisUnsuccessful] = useState(false)
+  const { fetchUserData } = useCurrentUser()
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault()
 
     const user = {
@@ -16,15 +31,19 @@ export const Login = ({ setToken }) => {
       password: password.current.value
     }
 
-    loginUser(user).then(res => {
-      if ("valid" in res && res.valid) {
-        setToken(res.token)
-        navigate("/")
-      }
-      else {
+    const res = await loginUser(user)
+    if ("valid" in res && res.valid) {
+      const userData = await getUserById(res.token)
+      if (!userData.active) {
         setisUnsuccessful(true)
+        return
       }
-    })
+      setToken(res.token)
+      fetchUserData()
+      navigate("/")
+    } else {
+      setisUnsuccessful(true)
+    }
   }
 
   return (
@@ -58,6 +77,8 @@ export const Login = ({ setToken }) => {
         {
           isUnsuccessful ? <p className="help is-danger">Username or password not valid</p> : ''
         }
+        {/* QuickLogin is a dev helper component that allows you to quickly log in as a standard user or staff user without having to type credentials. Will be removed in production. */}
+        <QuickLogin setToken={setToken} />
       </form>
     </section>
   )
