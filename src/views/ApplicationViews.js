@@ -13,7 +13,7 @@ import { EditPost } from "../components/posts/EditPost";
 import { BulmaSampler } from "../design/bulma-reference/BulmaSampler";
 // Added for Ticket #5 - Import PostDetails component for viewing individual posts
 import { PostDetails } from "../components/posts/PostDetails";
-import { CreateAPost } from "../components/posts/CreateAPost";
+import { NewPost } from "../components/posts/NewPost.jsx";
 import { PostComments } from "../components/comments/PostComments.jsx";
 import { ButtonDemo } from "../design/bulma-reference/ButtonDemo";
 import { UserProfiles } from "../components/users/UserProfiles.jsx";
@@ -35,11 +35,11 @@ export const ApplicationViews = ({ token, setToken }) => {
           <Route path="my-posts" element={<MyPosts />} />
           <Route path="my-posts/edit/:postId" element={<EditPost />} />
           <Route path="all-posts" element={<AllPosts />} />
-          <Route path="posts/new" element={<CreateAPost />} />
+          <Route path="posts/new" element={<NewPost />} />
           <Route path="categories" element={<CategoriesList />} />
           <Route path="categories/new" element={<NewCategory />} />
           <Route path="categories/edit/:categoryId" element={<EditCategory />} />
-        <Route path="bulma-sampler" element={<BulmaSampler />} />
+          <Route path="bulma-sampler" element={<BulmaSampler />} />
           <Route path="button-demo" element={<ButtonDemo />} />
           <Route path="posts/:postId" element={<PostDetails />} />
           <Route path="posts/:postId/comments" element={<PostComments />} />
