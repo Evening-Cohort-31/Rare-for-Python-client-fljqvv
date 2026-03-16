@@ -7,6 +7,7 @@ import { useCurrentUser } from "../../context/CurrentUserContext.js";
 import { FilterBar } from "../posts/FilterBar.jsx";
 import { Loading, PageHeader, Container, Button } from "../../design";
 import { PostCard } from "./PostCard.jsx";
+import { getAllTags } from "../../services";
 
 export const AllPosts = () => {
   const { currentUser } = useCurrentUser();
@@ -18,10 +19,22 @@ export const AllPosts = () => {
   const [inputValue, setInputValue] = useState("");
   // ADDED (search_post_title ticket): searchTerm only updates when Enter is pressed, this is what actually triggers the filter
   const [searchTerm, setSearchTerm] = useState("");
+  // ADDED (search_post_by_tag ticket): allTags holds the full list of tags fetched from the API for the dropdown
+  const [allTags, setAllTags] = useState([]);
+  // ADDED (search_post_by_tag ticket): selectedTag holds the tag id the user picks from the dropdown, empty string means no tag selected
+  const [selectedTag, setSelectedTag] = useState("");
 
   useEffect(() => {
     getAllPosts().then((allPosts) => {
       setPosts(allPosts);
+      setLoading(false);
+    });
+  }, []);
+
+  // ADDED (search_post_by_tag ticket): Fetch all tags on mount so the dropdown has options to show
+  useEffect(() => {
+    getAllTags().then((allTags) => {
+      setAllTags(allTags);
       setLoading(false);
     });
   }, []);
@@ -54,6 +67,14 @@ export const AllPosts = () => {
       );
     }
 
+    // ADDED (search_post_by_tag ticket): If a tag is selected, keep only posts that have that tag in their tags array
+    // Number() converts the string from the dropdown value back to a number to match t.id
+    if (selectedTag) {
+      filtered = filtered.filter((p) =>
+        p.tags?.some((t) => t.id === Number(selectedTag)),
+      );
+    }
+
     // Send the filtered list back to whoever called this function
     return filtered;
   };
@@ -64,10 +85,14 @@ export const AllPosts = () => {
       <Button className="is-link mb-5" onClick={() => navigate("/posts/new")}>
         New Post
       </Button>
+      {/* ADDED (search_post_by_tag ticket): Passing allTags, selectedTag, setSelectedTag so FilterBar can render the tag dropdown */}
       <FilterBar
         inputValue={inputValue}
         setInputValue={setInputValue}
         onSearch={handleSearch}
+        allTags={allTags}
+        selectedTag={selectedTag}
+        setSelectedTag={setSelectedTag}
       />
       <div className="columns is-multiline">
         {/* CHANGED (search_post_title ticket): Was posts.map — now calls getFilteredPost() first so only matching posts are shown */}
