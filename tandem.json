@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "config": {
+    "understandingChecks": true
+  },
+  "docs": [
+    {
+      "path": "README.md",
+      "scope": "general",
+      "purpose": "Project overview and getting started guide for the Rare publishing platform, including setup steps and notes on the Bulma CSS framework",
+      "tags": ["getting-started"]
+    },
+    {
+      "path": "pull_request_template.md",
+      "scope": "general",
+      "purpose": "Pull request template defining the required sections (description, changes, testing steps, notes) and workflow tips for contributors",
+      "tags": ["contributing", "workflow"]
+    },
+    {
+      "path": "dev-docs/PRD.md",
+      "scope": "general",
+      "purpose": "Product requirements, target users, tech stack decisions, project scope, and learning goals for the Rare publishing platform",
+      "tags": ["prd", "requirements", "scope", "stack"]
+    },
+    {
+      "path": "dev-docs/ARCHITECTURE.md",
+      "scope": "general",
+      "purpose": "System design, codebase map, entry points, component breakdown, inferred data model, API endpoint reference, and infrastructure notes",
+      "tags": ["architecture", "system-design", "data-model", "api"]
+    }
+  ]
+}
