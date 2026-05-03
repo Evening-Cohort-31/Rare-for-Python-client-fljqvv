@@ -6,6 +6,9 @@ import {
   getPostReactionsByPostId,
   updateOrCreatePostReaction,
 } from "../../services"
+import { ReactionPickerDialog } from "./ReactionPickerDialog"
+
+const MAX_VISIBLE_REACTIONS = 5
 
 export const ReactionBar = ({ postId, size = "small" }) => {
   const { currentUser } = useCurrentUser()
@@ -15,6 +18,7 @@ export const ReactionBar = ({ postId, size = "small" }) => {
   const [loading, setLoading] = useState(true)
   const [popReactionId, setPopReactionId] = useState(null)
   const [workingReactionId, setWorkingReactionId] = useState(null)
+  const [showDialog, setShowDialog] = useState(false)
 
   // useRef hook is used here to store the timer ID for the pop animation
   // It allows us to clear it if the user clicks multiple times quickly without causing unnecessary re-renders
@@ -92,11 +96,22 @@ export const ReactionBar = ({ postId, size = "small" }) => {
     }
   }
 
+  const handleReactionCreated = async () => {
+    const types = await getAllReactions()
+    setReactionTypes(types)
+  }
+
   if (loading) return <Loading />
+
+  const sortedReactions = [...reactionTypes].sort(
+    (a, b) => (countsByReactionId[b.id] || 0) - (countsByReactionId[a.id] || 0)
+  )
+  const visibleReactions = sortedReactions.slice(0, MAX_VISIBLE_REACTIONS)
+  const overflowReactions = sortedReactions.slice(MAX_VISIBLE_REACTIONS)
 
   return (
     <div className="tags are-medium">
-      {reactionTypes.map((rt) => {
+      {visibleReactions.map((rt) => {
         const count = countsByReactionId[rt.id] || 0
         const isSelected = myReactionId === rt.id
         const isWorking = workingReactionId === rt.id
@@ -116,7 +131,7 @@ export const ReactionBar = ({ postId, size = "small" }) => {
             title={currentUser ? rt.label : "Log in to react"}
           >
             <span className="icon is-small mr-1">
-              <i className={rt.icon_class} 
+              <i className={rt.icon_class}
               style={{color: isSelected ? rt.color : "#b5b5b5"}}>
               </i>
             </span>
@@ -125,6 +140,30 @@ export const ReactionBar = ({ postId, size = "small" }) => {
           </Tag>
         )
       })}
+
+      <Tag
+        rounded
+        light
+        className="reaction-tag add-reaction-tag"
+        onClick={() => setShowDialog(true)}
+        style={{ cursor: "pointer", userSelect: "none" }}
+        title="More reactions"
+      >
+        <span className="icon is-small">
+          <i className="fas fa-plus" style={{ color: "#b5b5b5" }}></i>
+        </span>
+      </Tag>
+
+      {showDialog && (
+        <ReactionPickerDialog
+          overflowReactions={overflowReactions}
+          countsByReactionId={countsByReactionId}
+          myReactionId={myReactionId}
+          onSelect={handleReact}
+          onReactionCreated={handleReactionCreated}
+          onClose={() => setShowDialog(false)}
+        />
+      )}
     </div>
   )
 }

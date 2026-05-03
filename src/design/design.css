@@ -135,3 +135,16 @@
     opacity: 0;
   }
 }
+
+/* Add reaction button */
+.add-reaction-tag {
+  border: 1px dashed #b5b5b5;
+}
+
+.add-reaction-tag:hover {
+  border-color: #4a4a4a;
+}
+
+.add-reaction-tag:hover i {
+  color: #4a4a4a !important;
+}
